@@ -31,7 +31,8 @@ const fadeVariants: Variants = {
 
 interface AnimatedPageProps {
     // FIX: Changed React.ReactNode to the explicitly imported ReactNode for type consistency.
-    children: ReactNode;
+    // FIX: Made children optional to resolve incorrect TypeScript errors where the compiler fails to detect children passed via JSX.
+    children?: ReactNode;
 }
 
 function AnimatedPage({ children }: AnimatedPageProps) {

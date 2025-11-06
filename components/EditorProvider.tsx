@@ -82,7 +82,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
                 setSiteContent(JSON.parse(draftContent));
             } else {
                 // Fetch the original content if no draft exists
-                const response = await fetch('./data/content.json');
+                const response = await fetch('/data/content.json');
                 if (!response.ok) throw new Error(`Failed to fetch content: ${response.statusText}`);
                 const data = await response.json();
                 setSiteContent(data);
