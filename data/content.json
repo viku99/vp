@@ -1,0 +1,120 @@
+{
+  "projects": [
+    {
+      "id": "aurora",
+      "title": "Aurora — Motion Short",
+      "category": "Motion",
+      "year": "2024",
+      "tools": ["After Effects", "Cinema 4D", "Premiere Pro"],
+      "thumbnail": "https://picsum.photos/seed/aurora-thumb/800/600",
+      "video": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+      "description": "A moody atmospheric short blending light and motion to tell a subtle story of discovery in a surreal, dreamlike landscape. The project focused on advanced particle systems and volumetric lighting.",
+      "images": [
+        "https://picsum.photos/seed/aurora1/1200/800",
+        "https://picsum.photos/seed/aurora2/1200/800",
+        "https://picsum.photos/seed/aurora3/1200/800"
+      ]
+    },
+    {
+      "id": "neoncity",
+      "title": "Neon City VFX",
+      "category": "VFX",
+      "year": "2023",
+      "tools": ["Nuke", "Autodesk Maya", "DaVinci Resolve"],
+      "thumbnail": "https://picsum.photos/seed/neoncity-thumb/800/600",
+      "video": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "description": "3D VFX integration shot blending live-action footage with rendered futuristic cityscapes. The challenge was to match lighting and reflections for a seamless composite.",
+      "images": [
+        "https://picsum.photos/seed/neon1/1200/800",
+        "https://picsum.photos/seed/neon2/1200/800",
+        "https://picsum.photos/seed/neon3/1200/800"
+      ]
+    },
+    {
+      "id": "dimension-drift",
+      "title": "Dimension Drift",
+      "category": "Illustration",
+      "year": "2023",
+      "tools": ["Photoshop", "Illustrator", "Procreate"],
+      "thumbnail": "https://picsum.photos/seed/dimension-thumb/800/600",
+      "video": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+      "description": "A series of digital illustrations exploring themes of alternate realities and ethereal beings. Each piece is crafted with a unique color palette and intricate line work.",
+      "images": [
+        "https://picsum.photos/seed/dimension1/1200/800",
+        "https://picsum.photos/seed/dimension2/1200/800",
+        "https://picsum.photos/seed/dimension3/1200/800"
+      ]
+    },
+    {
+      "id": "echoes",
+      "title": "Echoes in Stillness",
+      "category": "Motion",
+      "year": "2022",
+      "tools": ["After Effects", "Autodesk Maya"],
+      "thumbnail": "https://picsum.photos/seed/echoes-thumb/800/600",
+      "video": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+      "description": "An experimental motion piece exploring the visualization of sound in a minimalist environment. Abstract shapes react and morph to an ambient soundtrack.",
+      "images": [
+        "https://picsum.photos/seed/echoes1/1200/800",
+        "https://picsum.photos/seed/echoes2/1200/800",
+        "https://picsum.photos/seed/echoes3/1200/800"
+      ]
+    },
+    {
+      "id": "cyberscape",
+      "title": "Cyberscape",
+      "category": "VFX",
+      "year": "2024",
+      "tools": ["Nuke", "Houdini", "Figma"],
+      "thumbnail": "https://picsum.photos/seed/cyber-thumb/800/600",
+      "description": "A high-energy title sequence for a fictional sci-fi series. It combines glitch aesthetics with fluid simulations and holographic UI elements.",
+      "images": [
+        "https://picsum.photos/seed/cyber1/1200/800",
+        "https://picsum.photos/seed/cyber2/1200/800",
+        "https://picsum.photos/seed/cyber3/1200/800"
+      ]
+    },
+    {
+      "id": "solaris",
+      "title": "Solaris",
+      "category": "Motion",
+      "year": "2023",
+      "tools": ["Cinema 4D", "Redshift", "After Effects"],
+      "thumbnail": "https://picsum.photos/seed/solaris-thumb/800/600",
+      "video": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+      "description": "A cinematic journey through a stylized solar system, focusing on dramatic lighting and planetary textures. Rendered with Redshift for photorealistic results.",
+      "images": [
+        "https://picsum.photos/seed/solaris1/1200/800",
+        "https://picsum.photos/seed/solaris2/1200/800",
+        "https://picsum.photos/seed/solaris3/1200/800"
+      ]
+    }
+  ],
+  "testimonials": [
+    {
+      "id": "t1",
+      "quote": "Vikas has an incredible eye for detail and a deep understanding of visual storytelling. The final result exceeded all our expectations and elevated our entire project.",
+      "name": "Jane Doe",
+      "title": "Creative Director, Studio X",
+      "image": "https://i.pravatar.cc/150?u=jane"
+    },
+    {
+      "id": "t2",
+      "quote": "Working with Vikas was a seamless experience from start to finish. Exceptionally professional, endlessly creative, and delivered on time without a hitch. Highly recommended.",
+      "name": "John Smith",
+      "title": "Producer, Film Co.",
+      "image": "https://i.pravatar.cc/150?u=john"
+    },
+    {
+      "id": "t3",
+      "quote": "The motion graphics for our brand launch were absolutely stunning. Vikas has a unique ability to translate abstract concepts into compelling visuals that truly resonate.",
+      "name": "Emily White",
+      "title": "Marketing Lead, Tech Innovate",
+      "image": "https://i.pravatar.cc/150?u=emily"
+    }
+  ],
+  "about": {
+    "bio": "Currently studying Animation & VFX at CSMU, I am deeply passionate about creating compelling motion, crafting immersive stories, and engineering breathtaking visual effects. My work is a blend of technical skill and artistic vision.",
+    "skills": ["After Effects", "Autodesk Maya", "Nuke", "Photoshop", "Cinema 4D", "Premiere Pro", "DaVinci Resolve", "Houdini", "Figma"]
+  }
+}
