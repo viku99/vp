@@ -4,7 +4,8 @@
 // "split panel" animation for the portfolio section and a faster, simpler
 // fade animation for all other pages to improve UX.
 
-import React from 'react';
+// FIX: Import `ReactNode` explicitly to ensure consistent type resolution across the project.
+import React, { ReactNode } from 'react';
 import { motion, Variants } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 
@@ -29,7 +30,8 @@ const fadeVariants: Variants = {
 };
 
 interface AnimatedPageProps {
-    children: React.ReactNode;
+    // FIX: Changed React.ReactNode to the explicitly imported ReactNode for type consistency.
+    children: ReactNode;
 }
 
 function AnimatedPage({ children }: AnimatedPageProps) {

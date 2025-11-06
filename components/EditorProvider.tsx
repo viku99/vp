@@ -33,6 +33,7 @@ interface MediaModalState {
 // --- Context Definition ---
 interface EditorContextType {
     isLoading: boolean;
+    error: string | null;
     isEditMode: boolean;
     isAuthenticated: boolean;
     isLoginVisible: boolean;
@@ -63,6 +64,7 @@ export const useEditor = () => {
 // --- Provider Component ---
 export const EditorProvider = ({ children }: { children: ReactNode }) => {
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [siteContent, setSiteContent] = useState<SiteContent | null>(null);
     const [isEditMode, setIsEditMode] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -72,6 +74,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
 
     const loadData = useCallback(async () => {
         setIsLoading(true);
+        setError(null);
         try {
             // Check for a draft in local storage first
             const draftContent = localStorage.getItem(DRAFT_CONTENT_KEY);
@@ -80,13 +83,13 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
             } else {
                 // Fetch the original content if no draft exists
                 const response = await fetch('./data/content.json');
-                if (!response.ok) throw new Error('Network response was not ok.');
+                if (!response.ok) throw new Error(`Failed to fetch content: ${response.statusText}`);
                 const data = await response.json();
                 setSiteContent(data);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error("Failed to load portfolio data:", error);
-            // Handle error state, maybe set siteContent to an error object
+            setError(error.message || "An unknown error occurred while loading site data.");
         } finally {
             setIsLoading(false);
         }
@@ -181,6 +184,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
 
     const value = {
         isLoading,
+        error,
         isEditMode,
         isAuthenticated,
         isLoginVisible,

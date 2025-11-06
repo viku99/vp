@@ -130,6 +130,19 @@ Engage users in a helpful, human-like conversation about Vikas and his work. Use
         setInput('');
         setIsLoading(true);
 
+        if (!process.env.API_KEY) {
+            console.error("Gemini API key is not configured.");
+            const errorMessage: Message = { sender: 'bot', text: "I'm sorry, I can't connect right now. The API key for the AI service is missing. The site administrator needs to configure it." };
+            setMessages(prev => {
+                const newMessages = [...prev];
+                // Replace the temporary bot message with the error
+                newMessages[newMessages.length - 1] = errorMessage;
+                return newMessages;
+            });
+            setIsLoading(false);
+            return;
+        }
+
         try {
             if (!chatRef.current) {
                 initializeChat();

@@ -3,7 +3,8 @@
 // It sets up routing, the main layout, and the global EditorProvider
 // which powers the in-page, real-time content editing functionality.
 
-import React from 'react';
+// FIX: Import `ReactNode` explicitly to ensure consistent type resolution across the project.
+import React, { ReactNode } from 'react';
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -23,7 +24,8 @@ import MediaUploadModal from './components/MediaUploadModal';
 
 // --- Error Boundary (remains unchanged) ---
 // ... (previous ErrorBoundary code is correct and can be kept)
-class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
+// FIX: Changed React.ReactNode to the explicitly imported ReactNode for type consistency.
+class ErrorBoundary extends React.Component<{ children: ReactNode }, { hasError: boolean }> {
   state = { hasError: false };
   static getDerivedStateFromError() {
     return { hasError: true };
@@ -81,7 +83,27 @@ function App() {
 // --- Animated Routes ---
 function AppRoutes() {
     const location = useLocation();
-    const { isLoading, siteContent } = useEditor();
+    const { isLoading, siteContent, error } = useEditor();
+
+    if (error) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center text-center text-white p-4">
+              <h1 className="text-5xl font-black uppercase mb-4">Failed to Load Content</h1>
+              <p className="text-xl text-neutral-300 mb-8">
+                There was a problem fetching the site's data. Please try refreshing the page.
+              </p>
+              <p className="text-sm text-neutral-500 font-mono mb-8">Error: {error}</p>
+              <motion.button
+                onClick={() => window.location.reload()}
+                className="group inline-block mt-8 px-6 py-3 border border-white text-white uppercase text-sm tracking-widest hover:bg-white hover:text-black transition-all duration-300"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Refresh Page
+              </motion.button>
+            </div>
+        );
+    }
 
     // The entire app is in a loading state until the initial content is fetched.
     if (isLoading || !siteContent) {

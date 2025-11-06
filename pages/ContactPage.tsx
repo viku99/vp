@@ -83,6 +83,12 @@ function ContactPage() {
     setSuggestion(null);
     setError(null);
 
+    if (!process.env.API_KEY) {
+        setError("Sorry, the AI assistant is not configured. The site administrator needs to set up an API key.");
+        setIsLoading(false);
+        return;
+    }
+
     try {
         const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
         
