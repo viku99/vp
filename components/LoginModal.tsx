@@ -37,9 +37,9 @@ function LoginModal() {
         setIsLoading(true);
 
         try {
-            const success = await login(username, password);
-            if (!success) {
-                setError('Invalid username or password.');
+            const result = await login(username, password);
+            if (!result.success) {
+                setError(result.message || 'An error occurred.');
             }
         } catch (e) {
             setError('An unexpected error occurred.');

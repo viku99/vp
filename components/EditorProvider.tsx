@@ -2,10 +2,6 @@ import React, { createContext, useState, useEffect, useCallback, useContext, Rea
 import { SiteContent } from '../types';
 import { produce } from 'immer';
 
-// --- Hardcoded Credentials ---
-const ADMIN_USERNAME = 'admin$19';
-const ADMIN_PASSWORD = '19$admin';
-
 // --- Local Storage Key ---
 const DRAFT_CONTENT_KEY = 'portfolio_content_draft';
 
@@ -38,7 +34,7 @@ interface EditorContextType {
     isAuthenticated: boolean;
     isLoginVisible: boolean;
     setIsLoginVisible: (visible: boolean) => void;
-    login: (username: string, password: string) => Promise<boolean>;
+    login: (username: string, password: string) => Promise<{ success: boolean; message?: string; }>;
     logout: () => void;
     publishContent: () => void;
     resetContent: () => void;
@@ -118,13 +114,22 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     const login = useCallback(async (username, password) => {
         // Simulate network delay
         await new Promise(resolve => setTimeout(resolve, 500));
-        if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+        
+        const adminUser = process.env.ADMIN_USERNAME;
+        const adminPass = process.env.ADMIN_PASSWORD;
+
+        if (!adminUser || !adminPass) {
+            console.error("Admin credentials are not set in environment variables.");
+            return { success: false, message: "Admin credentials are not configured on the server. Please set environment variables." };
+        }
+
+        if (username === adminUser && password === adminPass) {
             setIsAuthenticated(true);
             setIsEditMode(true);
             setIsLoginVisible(false);
-            return true;
+            return { success: true };
         }
-        return false;
+        return { success: false, message: "Invalid username or password." };
     }, []);
     
     const logout = useCallback(() => {

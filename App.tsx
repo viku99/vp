@@ -33,7 +33,8 @@ interface ErrorBoundaryProps {
 // FIX: Using ErrorBoundaryProps to fix typing errors. This resolves issues where TypeScript fails to recognize 'props' on the component instance and incorrectly reports missing 'children'.
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, { hasError: boolean }> {
   state = { hasError: false };
-  static getDerivedStateFromError() {
+  // FIX: Added the required `error` parameter to the `getDerivedStateFromError` static method.
+  static getDerivedStateFromError(_error: Error) {
     return { hasError: true };
   }
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
