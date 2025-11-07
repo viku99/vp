@@ -32,8 +32,11 @@ interface ErrorBoundaryProps {
 // FIX: Changed React.ReactNode to the explicitly imported ReactNode for type consistency.
 // FIX: Using ErrorBoundaryProps to fix typing errors. This resolves issues where TypeScript fails to recognize 'props' on the component instance and incorrectly reports missing 'children'.
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, { hasError: boolean }> {
-  // FIX: Replaced constructor with a class property for state initialization. This is a more modern approach and resolves issues where TypeScript fails to correctly infer component state and props, fixing errors on `this.state` and `this.props`.
-  state = { hasError: false };
+  // FIX: Reverted to a standard constructor to explicitly initialize state and call super(props). This is a more robust method that ensures TypeScript correctly recognizes `this.props` and `this.state` on the component instance, resolving the compilation errors.
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
 
   // FIX: Added the required `error` parameter to the `getDerivedStateFromError` static method.
   static getDerivedStateFromError(_error: Error) {

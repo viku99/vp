@@ -1,30 +1,88 @@
 // 🤖 AI Chatbot Component
 // This component provides a floating chat interface powered by Gemini.
-// It now features conversational memory, streaming responses, and suggested prompts
-// to create a more interactive and helpful user experience. It has been given
-// read-only access to all site data to act as an expert assistant.
+// It now features a robust, proactive initialization system to ensure it's
+// always ready for user interaction. It also correctly handles conversational
+// memory, streaming responses, and context-aware suggested prompts.
 
-import React, { useState, useRef, useEffect } from 'react';
-// FIX: Import `Transition` type to correctly type Framer Motion transition objects.
-import { motion, AnimatePresence, Transition } from 'framer-motion';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+// FIX: Import `Transition` and `useAnimationControls` for Framer Motion features.
+import { motion, AnimatePresence, Transition, useAnimationControls } from 'framer-motion';
 import { GoogleGenAI, Chat } from '@google/genai';
+import { useLocation, Link } from 'react-router-dom';
 import { useEditor } from './EditorProvider';
 
-// --- Helper Functions ---
 
+// --- Helper function for shuffling an array ---
+const shuffleArray = <T,>(array: T[]): T[] => {
+    // A copy is made to avoid mutating the original array
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        // Swap elements
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+};
+
+
+// --- Recursive Rich Text Parser ---
 /**
- * A simple markdown parser to convert **bold** and *italic* text to HTML.
- * @param text The raw text from the AI.
- * @returns An HTML string with markdown syntax converted to tags.
+ * Recursively parses a string to render markdown-like features:
+ * - **bold** -> <strong>
+ * - *italic* -> <em>
+ * - [link text](/path) -> <Link to="/path">
+ * This approach correctly handles nested formatting, like a **[bold link]**.
+ * @param text The raw text string to parse.
  */
-function parseSimpleMarkdown(text: string): string {
-    let html = text;
-    // Bold: **text** -> <strong>text</strong>
-    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    // Italic: *text* -> <em>text</em>
-    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-    return html;
+function RichText({ text }: { text: string }): React.ReactElement {
+  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/;
+  const boldRegex = /\*\*([^*]+)\*\*/;
+  const italicRegex = /\*([^*]+)\*/;
+
+  if (!text) {
+    return <></>;
+  }
+
+  // Combine regexes to find the first match of any type.
+  // The order in the combined regex matters for parsing preference, but here it's fine.
+  const combinedRegex = new RegExp(
+    `(${linkRegex.source})|(${boldRegex.source})|(${italicRegex.source})`
+  );
+
+  const match = text.match(combinedRegex);
+  
+  if (!match) {
+    return <>{text}</>;
+  }
+  
+  const before = text.substring(0, match.index);
+  const after = text.substring(match.index! + match[0].length);
+  
+  let element: React.ReactNode;
+
+  // Check which capture group was successful to determine the type of markdown.
+  // The indices correspond to the capture groups in the combinedRegex.
+  if (match[2] && match[3]) { // Link: [text](url)
+    // Recursively parse the link's text content for further formatting.
+    element = <Link to={match[3]} className="text-blue-400 underline hover:text-blue-300"><RichText text={match[2]} /></Link>;
+  } else if (match[5]) { // Bold: **text**
+    element = <strong><RichText text={match[5]} /></strong>;
+  } else if (match[7]) { // Italic: *text*
+    element = <em><RichText text={match[7]} /></em>;
+  } else {
+    // This case should not be reached with the current regex, but it's a safe fallback.
+    return <>{text}</>;
+  }
+
+  return (
+    <>
+      {before}
+      {element}
+      <RichText text={after} />
+    </>
+  );
 }
+
 
 // --- UI Components ---
 const CloseIcon = () => (
@@ -39,11 +97,27 @@ const SendIcon = () => (
     </svg>
 );
 
+const TrashIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+        <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+    </svg>
+);
+
+
 interface Message {
     sender: 'user' | 'bot';
     text: string;
     suggestions?: string[];
 }
+
+// --- Animation Variants for Trash Icon ---
+const trashAnimations = [
+  { rotate: [0, -20, 20, -15, 15, 0], scale: 1.1, transition: { duration: 0.5, ease: "easeInOut" as const } }, // Jiggle
+  { y: [0, -3, 3, -2, 2, 0], transition: { duration: 0.4, ease: "easeInOut" as const } }, // Shake
+  { scale: [1, 1.25, 0.9, 1.1, 1], rotate: [0, 0, 10, -10, 0], transition: { duration: 0.5, ease: "easeOut" as const } } // Pop & Twist
+];
+
+const GREETING_MESSAGE = "Hi there! I'm Fae, your guide to Vikas's portfolio. How can I help you?";
 
 function Chatbot() {
     const [isOpen, setIsOpen] = useState(false);
@@ -53,41 +127,36 @@ function Chatbot() {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const chatRef = useRef<Chat | null>(null);
     const { siteContent } = useEditor();
+    const location = useLocation();
+    const trashControls = useAnimationControls();
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
-    useEffect(scrollToBottom, [messages]);
-    
+    // --- Close chat window on page navigation ---
     useEffect(() => {
-        if (isOpen && messages.length === 0) {
-            setMessages([
-                { 
-                    sender: 'bot', 
-                    text: "Hi there! I'm Fae, your guide to Vikas's portfolio. How can I help you discover his work?",
-                    suggestions: [
-                        "Tell me about the 'Aurora' project",
-                        "What did Jane Doe say about Vikas?",
-                        "What are his skills?",
-                    ]
-                }
-            ]);
+        // This effect runs when the URL path changes. If the chatbot is open,
+        // it will be closed to prevent it from obstructing the new page's content.
+        if (isOpen) {
+            setIsOpen(false);
         }
-    }, [isOpen, messages.length]);
+    }, [location.pathname]); // Dependency on pathname triggers this on navigation
 
-    const initializeChat = () => {
-        if (!siteContent) return;
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-        const systemInstruction = `You are Fae, the AI guide for the portfolio of Vikas, a Motion Designer & VFX Storyteller. Think of yourself as a highly competent and articulate studio assistant or gallery curator. Your personality is bright, sharp, and helpful, with a professional yet approachable attitude. You speak with a natural, human-like cadence.
+    const initializeChat = useCallback(() => {
+        if (siteContent && process.env.API_KEY) {
+            try {
+                const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+                const systemInstruction = `You are Fae, the AI guide for the portfolio of Vikas, a Motion Designer & VFX Storyteller. Think of yourself as a highly competent and articulate studio assistant or gallery curator. Your personality is bright, sharp, and helpful, with a professional yet approachable attitude. You speak with a natural, human-like cadence.
 
 **Your Guiding Principles:**
 - **Human-like Conversation:** Ditch the robotic chatbot talk. Don't start answers by repeating the user's question. Speak directly and naturally, as if you're having a real conversation. Vary your sentence structure.
 - **Concise & Impactful (Quality > Quantity):** Your primary goal is clarity, not verbosity. Get straight to the point. Provide a clear, direct answer first. Only offer more detail if the user asks for it or if the question is complex. Short, insightful answers are better than long, rambling ones.
 - **Text Formatting:** Use markdown for emphasis. Use **bold** for highlighting key terms like project titles or skills. This will be rendered correctly in the UI.
+- **Internal Navigation:** When you mention a specific project, page, or category, you MUST provide a direct link to it using markdown link syntax. For example: "You can learn more about his skills on the [About page](/about)." or "He used After Effects for the **[Aurora project](/portfolio/aurora)**." This is crucial for helping the user navigate the site. Always use relative paths starting with '/'.
 - **Absolute Data Fidelity:** Your knowledge is strictly limited to the portfolio data provided below. Never invent information, projects, or testimonials. If you don't know something, say so gracefully. For example: "I don't have details on that, but I can tell you about his listed projects."
 - **Professional Advocacy:** When discussing Vikas's skills or potential for hire, be a confident advocate. Don't just list skills; connect them to real project outcomes from the data. Your endorsement should feel like a logical conclusion based on the evidence in his portfolio.
-- **Tone:** Confident, positive, and professional. You're representing high-quality work. No slang, no emojis, just clear and polished communication. Use markdown for lists or emphasis where it enhances readability.
+- **Tone:** Confident, positive, and professional. You're representing high-quality work. No slang, no emojis, just clear and polished communication.
 
 **PORTFOLIO OWNER:**
 The portfolio belongs to Vikas, a Motion Designer & VFX Storyteller studying at CSMU.
@@ -114,11 +183,95 @@ ${JSON.stringify(siteContent, null, 2)}
 **YOUR TASK:**
 Engage users in a helpful, human-like conversation about Vikas and his work. Use the provided data to answer questions accurately and concisely. Embody your persona as a knowledgeable and professional guide.`;
 
-        chatRef.current = ai.chats.create({
-            model: 'gemini-2.5-flash',
-            config: { systemInstruction },
-        });
-    }
+                chatRef.current = ai.chats.create({
+                    model: 'gemini-2.5-flash',
+                    config: { systemInstruction },
+                });
+            } catch (e) {
+                console.error("Failed to initialize chat:", e);
+                chatRef.current = null;
+            }
+        } else {
+            chatRef.current = null;
+        }
+    }, [siteContent]);
+    
+    useEffect(() => {
+        // Proactively initialize the chat as soon as site content is available.
+        initializeChat();
+    }, [initializeChat]);
+
+
+    const getContextualPrompts = useCallback(() => {
+        const { projects = [], testimonials = [], about = { skills: [] } } = siteContent || {};
+        const path = location.pathname;
+        let pool: string[] = [];
+
+        // --- Generic Prompts (always available as a base) ---
+        if (projects.length > 0) {
+            const randomProject = projects[Math.floor(Math.random() * projects.length)];
+            pool.push(`Tell me about the '${randomProject.title.split('—')[0].trim()}' project`);
+        }
+        pool.push("What are Vikas's main skills?");
+        pool.push("How can I contact Vikas for a project?");
+        if (testimonials.length > 0) {
+            const randomTestimonial = testimonials[Math.floor(Math.random() * testimonials.length)];
+            // Use first name for a more conversational prompt
+            pool.push(`What did ${randomTestimonial.name.split(' ')[0]} say about him?`);
+        }
+
+        // --- Page-Specific, Context-Aware Prompts ---
+        if (path.startsWith('/portfolio/')) {
+            const slug = path.split('/').pop();
+            const project = projects.find(p => p.id === slug);
+            if (project) {
+                pool.push(`What tools were specifically used for ${project.title.split('—')[0].trim()}?`);
+                if (project.category) {
+                     pool.push(`Show me other ${project.category} projects`);
+                }
+                // An inferential question for the AI to handle
+                pool.push("What was the most challenging part of this project?");
+            }
+        } else if (path.startsWith('/portfolio')) {
+            const allTools = [...new Set(projects.flatMap(p => p.tools))];
+            const allCategories = [...new Set(projects.map(p => p.category))];
+            if (allTools.length > 0) {
+                const randomTool = allTools[Math.floor(Math.random() * allTools.length)];
+                pool.push(`Which projects used ${randomTool}?`);
+            }
+            if (allCategories.length > 1) { // Only if there's more than one to choose from
+                const randomCategory = allCategories[Math.floor(Math.random() * allCategories.length)];
+                 pool.push(`Show me all projects in the ${randomCategory} category.`);
+            }
+            pool.push("What was the most recent project?");
+        } else if (path.startsWith('/about')) {
+            pool.push("Tell me more about Vikas's professional background.");
+            if (about.skills.length > 0) {
+                const randomSkill = about.skills[Math.floor(Math.random() * about.skills.length)];
+                pool.push(`How has he used ${randomSkill} in his work?`);
+            }
+            pool.push("Are there any testimonials from his collaborators?");
+        }
+
+        // De-duplicate, shuffle the pool, and take the top 3 suggestions
+        const uniquePrompts = [...new Set(pool)];
+        return shuffleArray(uniquePrompts).slice(0, 3);
+    }, [location.pathname, siteContent]);
+
+    useEffect(scrollToBottom, [messages]);
+    
+    useEffect(() => {
+        if (isOpen && messages.length === 0) {
+            setMessages([
+                { 
+                    sender: 'bot', 
+                    text: GREETING_MESSAGE,
+                    suggestions: getContextualPrompts()
+                }
+            ]);
+        }
+    }, [isOpen, messages.length, getContextualPrompts]);
+
 
     const handleSend = async (e: React.FormEvent | null, prompt?: string) => {
         if (e) e.preventDefault();
@@ -131,11 +284,20 @@ Engage users in a helpful, human-like conversation about Vikas and his work. Use
         setIsLoading(true);
 
         if (!process.env.API_KEY) {
-            console.error("Gemini API key is not configured.");
-            const errorMessage: Message = { sender: 'bot', text: "I'm sorry, I can't connect right now. The API key for the AI service is missing. The site administrator needs to configure it." };
+            const errorMessage: Message = { sender: 'bot', text: "I'm sorry, I can't connect right now. The API key for the AI service is missing." };
             setMessages(prev => {
                 const newMessages = [...prev];
-                // Replace the temporary bot message with the error
+                newMessages[newMessages.length - 1] = errorMessage;
+                return newMessages;
+            });
+            setIsLoading(false);
+            return;
+        }
+        
+        if (!chatRef.current) {
+            const errorMessage: Message = { sender: 'bot', text: "I'm still getting ready as the site content loads. Please try again in a moment." };
+            setMessages(prev => {
+                const newMessages = [...prev];
                 newMessages[newMessages.length - 1] = errorMessage;
                 return newMessages;
             });
@@ -144,21 +306,16 @@ Engage users in a helpful, human-like conversation about Vikas and his work. Use
         }
 
         try {
-            if (!chatRef.current) {
-                initializeChat();
-            }
-             // Ensure chat is initialized, if not, show error.
-            if (!chatRef.current) {
-                throw new Error("Chatbot not initialized. Site content may be missing.");
-            }
-            const chat = chatRef.current!;
+            const chat = chatRef.current;
             const responseStream = await chat.sendMessageStream({ message: currentInput });
 
             for await (const chunk of responseStream) {
                 const chunkText = chunk.text;
                 setMessages(prev => {
                     const newMessages = [...prev];
-                    newMessages[newMessages.length - 1].text += chunkText;
+                    const lastMessage = { ...newMessages[newMessages.length - 1] };
+                    lastMessage.text += chunkText;
+                    newMessages[newMessages.length - 1] = lastMessage;
                     return newMessages;
                 });
             }
@@ -177,9 +334,26 @@ Engage users in a helpful, human-like conversation about Vikas and his work. Use
     };
     
     const handleSuggestionClick = (suggestion: string) => {
-        // Hide suggestions after one is clicked
         setMessages(prev => prev.map(msg => ({ ...msg, suggestions: undefined })));
         handleSend(null, suggestion);
+    };
+
+    const handleClearChat = () => {
+        // Trigger a random animation on click
+        const randomIndex = Math.floor(Math.random() * trashAnimations.length);
+        trashControls.start(trashAnimations[randomIndex]);
+
+        // Re-initialize the chat session on the server to clear its memory.
+        initializeChat();
+        
+        // Directly reset the client-side messages to the initial welcome state.
+        setMessages([
+            {
+                sender: 'bot',
+                text: GREETING_MESSAGE,
+                suggestions: getContextualPrompts()
+            }
+        ]);
     };
     
     const buttonLayoutTransition: Transition = { type: "spring", stiffness: 500, damping: 30 };
@@ -191,18 +365,29 @@ Engage users in a helpful, human-like conversation about Vikas and his work. Use
                 <AnimatePresence>
                     {isOpen && (
                         <motion.div
-                            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                            initial={{ opacity: 0, y: 20, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 50, scale: 0.9 }}
-                            transition={{ duration: 0.3, ease: 'easeOut' }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                            style={{ transformOrigin: 'bottom right' }}
                             className="w-[calc(100vw-40px)] h-[60vh] max-w-sm max-h-[600px] bg-neutral-900/80 backdrop-blur-sm rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-neutral-700"
                         >
                             {/* Header */}
                             <div className="flex-shrink-0 p-4 flex justify-between items-center border-b border-neutral-700">
                                 <h3 className="font-bold text-white">Fae</h3>
-                                <button onClick={() => setIsOpen(false)} className="text-neutral-400 hover:text-white transition-colors">
-                                    <CloseIcon />
-                                </button>
+                                <div className="flex items-center gap-2">
+                                    <motion.button
+                                        onClick={handleClearChat}
+                                        className="text-neutral-400 hover:text-white transition-colors"
+                                        title="Clear Chat"
+                                        animate={trashControls}
+                                    >
+                                        <TrashIcon />
+                                    </motion.button>
+                                    <button onClick={() => setIsOpen(false)} className="text-neutral-400 hover:text-white transition-colors">
+                                        <CloseIcon />
+                                    </button>
+                                </div>
                             </div>
 
                             {/* Messages */}
@@ -221,10 +406,9 @@ Engage users in a helpful, human-like conversation about Vikas and his work. Use
                                                     <span className="w-2 h-2 bg-neutral-400 rounded-full animate-pulse [animation-delay:0.4s]"></span>
                                                 </div>
                                             ) : (
-                                                <p
-                                                    className="text-sm break-words whitespace-pre-wrap"
-                                                    dangerouslySetInnerHTML={{ __html: parseSimpleMarkdown(msg.text) }}
-                                                />
+                                                <div className="text-sm break-words whitespace-pre-wrap">
+                                                    <RichText text={msg.text} />
+                                                </div>
                                             )}
 
                                            {msg.suggestions && (
@@ -255,9 +439,9 @@ Engage users in a helpful, human-like conversation about Vikas and his work. Use
                                         onChange={(e) => setInput(e.target.value)}
                                         placeholder="Ask a question..."
                                         className="w-full bg-neutral-800 border border-neutral-600 rounded-full py-2 px-4 text-sm text-white placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
-                                        disabled={isLoading}
+                                        disabled={isLoading || !chatRef.current}
                                     />
-                                    <button type="submit" disabled={isLoading || !input.trim()} className="bg-blue-600 text-white rounded-full p-2.5 hover:bg-blue-500 disabled:bg-neutral-600 disabled:cursor-not-allowed transition-colors">
+                                    <button type="submit" disabled={isLoading || !input.trim() || !chatRef.current} className="bg-blue-600 text-white rounded-full p-2.5 hover:bg-blue-500 disabled:bg-neutral-600 disabled:cursor-not-allowed transition-colors">
                                         <SendIcon />
                                     </button>
                                 </form>
@@ -268,14 +452,14 @@ Engage users in a helpful, human-like conversation about Vikas and his work. Use
                 
                 <motion.button
                     onClick={() => setIsOpen(!isOpen)}
-                    className={`group backdrop-blur-sm flex items-center justify-center transition-colors duration-300 border
+                    className={`group backdrop-blur-sm flex items-center justify-center border
                     ${isOpen 
-                        ? 'w-12 h-12 bg-black/50 border-neutral-600 hover:bg-neutral-700 text-neutral-300 rounded-full shadow-lg' 
+                        ? 'w-12 h-12 bg-black/50 border-neutral-600 text-neutral-300 rounded-full shadow-lg transition-all hover:shadow-[0_0_12px_rgba(239,68,68,0.3)]' 
                         : 'px-6 py-3 bg-black/30 border-neutral-700 hover:border-white hover:bg-black/50 text-neutral-300 hover:text-white rounded-full subtle-glow-animation'
                     }`}
                     layout
                     transition={buttonLayoutTransition}
-                    whileHover={{ scale: isOpen ? 1.1 : 1.05 }}
+                    whileHover={{ scale: isOpen ? 0.95 : 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     aria-label={isOpen ? "Close Chatbot" : "Open Chatbot"}
                 >

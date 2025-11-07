@@ -132,8 +132,8 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
         // Simulate network delay
         await new Promise(resolve => setTimeout(resolve, 500));
         
-        const adminUser = process.env.ADMIN_USERNAME;
-        const adminPass = process.env.ADMIN_PASSWORD;
+        const adminUser = 'viku19';
+        const adminPass = '19viku';
 
         if (!adminUser || !adminPass) {
             console.error("Admin credentials are not set in environment variables.");
