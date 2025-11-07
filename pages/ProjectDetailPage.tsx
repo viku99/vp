@@ -253,7 +253,6 @@ function ProjectDetailPage() {
     
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            // FIX: Corrected typo from `shareMenuref` to `shareMenuRef`.
             if (shareMenuRef.current && !shareMenuRef.current.contains(event.target as Node)) {
                 setIsShareOpen(false);
             }
