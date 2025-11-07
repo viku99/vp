@@ -102,13 +102,28 @@ You must choose one of the following channels:
 - **Instagram**: For casual messages, quick questions, and social interactions.
 - **WhatsApp**: Only for very urgent or direct communication. Use this sparingly.
 
-Analyze the user's message for its tone, content, and likely intent. Based on your analysis, you must return a JSON object with the *exact* following structure:
+**Handling Inappropriate or Unclear Messages:**
+- If the user's message is abusive, inappropriate, sexually explicit, nonsensical (e.g., 'meow', 'asdfghjk'), or completely irrelevant to a professional inquiry, you MUST decline to process it. Respond with the following JSON object:
+  \`\`\`json
+  {
+    "channel": "Decline",
+    "reason": "I can only process messages related to professional inquiries. Please provide details about a project or collaboration.",
+    "cta_text": "",
+    "link": ""
+  }
+  \`\`\`
+- Do NOT engage with inappropriate content. Simply return the 'Decline' object.
+
+**Standard Response:**
+For all legitimate inquiries, analyze the user's message for its tone, content, and likely intent. Based on your analysis, you must return a JSON object with the *exact* following structure:
+\`\`\`json
 {
   "channel": "The single best channel name from the list above",
   "reason": "A short, friendly, one-sentence explanation for your choice.",
   "cta_text": "A compelling call-to-action for the button, like 'Connect on LinkedIn' or 'Send an Email'.",
   "link": "The corresponding contact link."
 }
+\`\`\`
 
 Here are the links for each channel:
 - Email: "mailto:vikasbg.png@gmail.com?subject=Contact from Portfolio&body=${encodeURIComponent(message)}"
@@ -142,7 +157,13 @@ Be thoughtful in your recommendation to ensure the communication is efficient an
         });
 
         const parsedSuggestion = JSON.parse(response.text);
-        setSuggestion(parsedSuggestion);
+        
+        if (parsedSuggestion.channel === 'Decline') {
+            setError(parsedSuggestion.reason);
+            setSuggestion(null);
+        } else {
+            setSuggestion(parsedSuggestion);
+        }
 
     } catch (err) {
         console.error("AI analysis failed:", err);

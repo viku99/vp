@@ -77,6 +77,7 @@ const FloatingVideoPlayer: React.FC<{ src: string }> = ({ src }) => {
     const [isPlaying, setIsPlaying] = useState(true);
     const [isClosed, setIsClosed] = useState(false);
     const [playbackError, setPlaybackError] = useState(false);
+    const [shouldScroll, setShouldScroll] = useState(false);
 
     const containerRef = useRef<HTMLDivElement>(null);
     const playerDivRef = useRef<HTMLDivElement>(null);
@@ -86,21 +87,35 @@ const FloatingVideoPlayer: React.FC<{ src: string }> = ({ src }) => {
     const videoId = isYouTube ? getYouTubeVideoId(src) : null;
 
     useEffect(() => {
-        if (!isClosed) {
-            const observer = new IntersectionObserver(
-                ([entry]) => {
-                    if (playerInstanceRef.current || !isYouTube) {
-                        setIsMini(!entry.isIntersecting);
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (!playerInstanceRef.current && isYouTube) return;
+    
+                if (entry.isIntersecting) {
+                    // Player is back in view, so restore it.
+                    setIsMini(false);
+                    setIsClosed(false);
+                } else {
+                    // Player is out of view.
+                    // Activate mini-player only if it hasn't been manually closed.
+                    if (!isClosed) {
+                        setIsMini(true);
                     }
-                },
-                { threshold: 0.5 }
-            );
-
-            if (containerRef.current) observer.observe(containerRef.current);
-            return () => {
-                if (containerRef.current) observer.unobserve(containerRef.current);
-            };
+                }
+            },
+            { threshold: 0.5 }
+        );
+        
+        const currentContainer = containerRef.current;
+        if (currentContainer) {
+            observer.observe(currentContainer);
         }
+    
+        return () => {
+            if (currentContainer) {
+                observer.unobserve(currentContainer);
+            }
+        };
     }, [isClosed, isYouTube]);
 
     useEffect(() => {
@@ -112,7 +127,14 @@ const FloatingVideoPlayer: React.FC<{ src: string }> = ({ src }) => {
                 videoId: videoId,
                 playerVars: { autoplay: 1, mute: 1, loop: 1, playlist: videoId, controls: 1, modestbranding: 1, rel: 0 },
                 events: {
-                    'onReady': () => setIsPlaying(true),
+                    'onReady': (event: any) => {
+                        setIsPlaying(true);
+                        // Disable native Picture-in-Picture to avoid conflicts with the custom mini-player
+                        const iframe = event.target.getIframe();
+                        if (iframe) {
+                            iframe.setAttribute('disablepictureinpicture', 'true');
+                        }
+                    },
                     'onError': (e: any) => { if ([101, 150].includes(e.data)) setPlaybackError(true); },
                     'onStateChange': (e: any) => setIsPlaying(e.data === window.YT.PlayerState.PLAYING)
                 }
@@ -132,6 +154,13 @@ const FloatingVideoPlayer: React.FC<{ src: string }> = ({ src }) => {
         };
     }, [isYouTube, videoId]);
     
+    useEffect(() => {
+        if (shouldScroll) {
+            containerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setShouldScroll(false);
+        }
+    }, [shouldScroll]);
+
     const handlePlayPause = () => {
         if (!playerInstanceRef.current) return;
         const player = playerInstanceRef.current;
@@ -144,13 +173,20 @@ const FloatingVideoPlayer: React.FC<{ src: string }> = ({ src }) => {
     };
 
     const handleClose = () => {
-        handlePlayPause();
+        if (playerInstanceRef.current && isPlaying) {
+            if (isYouTube) {
+                playerInstanceRef.current.pauseVideo();
+            } else {
+                playerInstanceRef.current.pause();
+            }
+            setIsPlaying(false);
+        }
         setIsClosed(true);
     };
 
     const handleExpand = () => {
         setIsMini(false);
-        containerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setShouldScroll(true);
     };
 
     if (playbackError && videoId) {
@@ -184,7 +220,7 @@ const FloatingVideoPlayer: React.FC<{ src: string }> = ({ src }) => {
                             {isYouTube ? (
                                 <div ref={playerDivRef} className="w-full h-full" />
                             ) : (
-                                <video ref={playerInstanceRef} key={src} className="w-full h-full object-contain" controls loop muted playsInline autoPlay onPlay={() => setIsPlaying(true)} onPause={() => setIsPlaying(false)}>
+                                <video ref={playerInstanceRef} key={src} className="w-full h-full object-contain" controls loop muted playsInline autoPlay onPlay={() => setIsPlaying(true)} onPause={() => setIsPlaying(false)} disablePictureInPicture>
                                     <source src={src} type="video/mp4" />
                                 </video>
                             )}
@@ -216,6 +252,7 @@ function ProjectDetailPage() {
     
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
+            // FIX: Corrected typo from `shareMenuref` to `shareMenuRef`.
             if (shareMenuRef.current && !shareMenuRef.current.contains(event.target as Node)) {
                 setIsShareOpen(false);
             }
