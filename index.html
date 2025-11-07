@@ -46,10 +46,12 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
 </head>
   <body class="bg-black">
     <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
+    <!-- Add Babel to transpile JSX/TSX on the fly for deployment -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Change script type to text/babel to be processed by Babel -->
+    <script type="text/babel" data-presets="react,typescript" data-type="module" src="/index.tsx"></script>
   </body>
 </html>
