@@ -84,7 +84,7 @@ const Editable: React.FC<EditableProps> = ({
     if (!isEditMode) {
         if (render) return <>{render(text)}</>;
         if (children) return <>{children}</>;
-        // FIX: Render text directly instead of using dangerouslySetInnerHTML for improved security and reliability.
+        // Render text directly. This is safe and prevents XSS.
         return <Component className={className}>{Array.isArray(text) ? text.join(', ') : text}</Component>;
     }
 
@@ -128,7 +128,7 @@ const Editable: React.FC<EditableProps> = ({
     const displayContent = () => {
         if (render) return render(text);
         if (Array.isArray(text)) return text.map((item, index) => <React.Fragment key={index}>{item}{index < text.length - 1 ? ", " : ""}</React.Fragment>);
-        // FIX: Return text directly to avoid creating an extra div and using dangerous HTML injection.
+        // Return raw text; React will safely escape it.
         return text;
     }
 
