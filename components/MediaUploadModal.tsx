@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+'use client';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEditor } from './EditorProvider';
 import get from 'lodash.get';
@@ -11,7 +12,7 @@ const MediaUploadModal = () => {
     const [activeTab, setActiveTab] = useState('url');
     const [localFile, setLocalFile] = useState<File | null>(null);
 
-    const initialValue = path ? get(siteContent, path, '') : '';
+    const initialValue = path && siteContent ? get(siteContent, path, '') : '';
 
     useEffect(() => {
         if (isVisible) {
@@ -26,13 +27,8 @@ const MediaUploadModal = () => {
         updateSiteContent(draft => {
             const keys = path.replace(/\[(\d+)\]/g, '.$1').split('.');
             let current: any = draft;
-            while (keys.length > 1) {
-                const key = keys.shift()!;
-                current = current[key];
-            }
-            if (keys[0]) {
-               current[keys[0]] = url;
-            }
+            keys.slice(0, -1).forEach(key => current = current[key]);
+            current[keys[keys.length - 1]] = url;
         });
         closeMediaModal();
     };
@@ -72,14 +68,7 @@ const MediaUploadModal = () => {
                                 <label htmlFor="media-url" className="block text-sm font-medium text-neutral-400 mb-2">
                                     Enter an image or video URL. YouTube links are also supported.
                                 </label>
-                                <input
-                                    id="media-url"
-                                    type="text"
-                                    value={url}
-                                    onChange={(e) => setUrl(e.target.value)}
-                                    placeholder="https://... or youtube.com/watch?v=..."
-                                    className="w-full bg-neutral-800 border border-neutral-600 rounded-md py-2 px-3 text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                />
+                                <input id="media-url" type="text" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://... or youtube.com/watch?v=..." className="w-full bg-neutral-800 border border-neutral-600 rounded-md py-2 px-3 text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
                             </div>
                         )}
                         
@@ -88,21 +77,16 @@ const MediaUploadModal = () => {
                                 <label htmlFor="media-upload" className="block text-sm font-medium text-neutral-400 mb-2">
                                     Select a file from your computer.
                                 </label>
-                                <input
-                                    id="media-upload"
-                                    type="file"
-                                    onChange={handleFileChange}
-                                    className="w-full text-sm text-neutral-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-neutral-700 file:text-white hover:file:bg-neutral-600"
-                                />
+                                <input id="media-upload" type="file" onChange={handleFileChange} className="w-full text-sm text-neutral-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-neutral-700 file:text-white hover:file:bg-neutral-600" />
                                 <div className="mt-4 p-4 bg-neutral-800 rounded-md text-sm text-neutral-400">
                                     <h4 className="font-bold text-white mb-2">How this works:</h4>
                                     <ol className="list-decimal list-inside space-y-1">
                                         <li>Select a file from your computer.</li>
-                                        <li>Upload it to a hosting service (e.g., Imgur, Cloudinary, or your project's public folder).</li>
+                                        <li>Upload it to a hosting service (e.g., Imgur, Cloudinary).</li>
                                         <li>Copy the public URL for the file.</li>
                                         <li>Switch to the "Use a URL" tab and paste the link there.</li>
                                     </ol>
-                                    <p className="mt-3">This site is static, so files must be hosted online to be viewed by everyone.</p>
+                                    <p className="mt-3">This site requires files to be hosted online to be viewed by everyone.</p>
                                 </div>
                                 {localFile && <p className="mt-2 text-xs text-green-400">Selected: {localFile.name}</p>}
                             </div>

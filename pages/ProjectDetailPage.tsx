@@ -292,6 +292,9 @@ function ProjectDetailPage() {
                         src={project.thumbnail} 
                         alt={project.title} 
                         className="aspect-video bg-neutral-900 rounded-lg"
+                        // FIX: Added required width and height props.
+                        width={1280}
+                        height={720}
                     />
                 </Editable>
             );
@@ -413,6 +416,9 @@ function ProjectDetailPage() {
                                                     src={image} 
                                                     alt={`Project image ${index + 1}`} 
                                                     className="w-full h-full" 
+                                                    // FIX: Added required width and height props.
+                                                    width={800}
+                                                    height={450}
                                                 />
                                             </motion.div>
                                         </Editable>

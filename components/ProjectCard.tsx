@@ -1,7 +1,3 @@
-// 📇 Project Card Component
-// This component displays a single project thumbnail in the portfolio grid.
-// In edit mode, it shows controls for editing, deleting, and reordering.
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -23,21 +19,14 @@ const getCardSpan = (index: number) => {
     return 'lg:col-span-1';
 }
 
-// --- Icons ---
-const EditIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L16.732 3.732z" /></svg>
-);
-const DeleteIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-);
+const EditIcon = () => ( <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L16.732 3.732z" /></svg> );
+const DeleteIcon = () => ( <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg> );
 
-// FIX: Define a dedicated interface for props. This improves readability and can resolve complex type inference issues where TypeScript incorrectly includes React-specific attributes like `key` in the component's props validation.
 interface ProjectCardProps {
   project: Project;
   index: number;
 }
 
-// FIX: Changed to a React.FC to explicitly type as a Function Component. This helps TypeScript correctly infer how to handle special props like `key`, resolving the assignment error.
 const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
   const { isEditMode, updateSiteContent } = useEditor();
   const fallbackThumbnail = `https://picsum.photos/seed/${project.id}/800/600`;
@@ -55,13 +44,12 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
   const handleEdit = (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      // Logic to open an edit modal would go here
       alert(`Editing "${project.title}"... (modal not implemented yet)`);
   }
 
   return (
     <motion.div
-      className={`group relative aspect-video overflow-hidden ${getCardSpan(index)}`}
+      className={`group relative aspect-video overflow-hidden rounded-lg ${getCardSpan(index)}`}
       variants={cardVariants}
     >
       {isEditMode && (
@@ -75,6 +63,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
           src={project.thumbnail || fallbackThumbnail}
           alt={project.title}
           className="w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-105"
+          width={800}
+          height={450}
         />
         <div className="absolute inset-0 bg-black bg-opacity-40 transition-opacity duration-500 group-hover:bg-opacity-70" />
         <div className="absolute inset-0 flex flex-col justify-end p-6 text-white">

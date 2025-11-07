@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useEffect } from 'react';
 
 const getLqipUrl = (src: string): string => {
@@ -6,7 +7,7 @@ const getLqipUrl = (src: string): string => {
         try {
             const url = new URL(src);
             const parts = url.pathname.split('/');
-            if (parts.length >= 2) {
+            if (parts.length >= 4) { // e.g. /seed/name/w/h
                 const width = parseInt(parts[parts.length - 2], 10);
                 const height = parseInt(parts[parts.length - 1], 10);
                 if (!isNaN(width) && !isNaN(height)) {

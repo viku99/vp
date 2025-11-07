@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useEditor } from './EditorProvider';
@@ -32,7 +33,7 @@ const AddTestimonialModal: React.FC<AddTestimonialModalProps> = ({ testimonial, 
                     quote: formData.quote || '',
                     name: formData.name || '',
                     title: formData.title || '',
-                    image: formData.image || `https://i.pravatar.cc/150?u=${Date.now()}` // Placeholder image
+                    image: formData.image || `https://i.pravatar.cc/150?u=${Date.now()}`
                 };
                 draft.testimonials.unshift(newTestimonial);
             } else {

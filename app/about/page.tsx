@@ -1,15 +1,11 @@
-// 👤 About Page
-// This page provides a personal introduction.
-// It includes a short bio, a list of technical skills/tools, and an image.
-
+'use client';
 import React, { useState } from 'react';
 import { motion, AnimatePresence, Reorder } from 'framer-motion';
-import AnimatedPage from '../components/AnimatedPage';
-import { useEditor } from '../components/EditorProvider';
-import Editable from '../components/Editable';
-import { Testimonial } from '../types';
-import AddTestimonialModal from '../components/AddTestimonialModal';
-import LazyImage from '../components/LazyImage';
+import { useEditor } from '@/components/EditorProvider';
+import Editable from '@/components/Editable';
+import { Testimonial } from '@/types';
+import AddTestimonialModal from '@/components/AddTestimonialModal';
+import LazyImage from '@/components/LazyImage';
 
 
 // --- Icons for Edit Mode ---
@@ -28,8 +24,7 @@ const ReorderIcon = () => (
     </svg>
 );
 
-
-function AboutPage() {
+export default function AboutPage() {
   const { siteContent, isEditMode, updateSiteContent } = useEditor();
   const [editingTestimonial, setEditingTestimonial] = useState<Testimonial | null>(null);
 
@@ -74,7 +69,6 @@ function AboutPage() {
   
   return (
     <>
-    <AnimatedPage>
       <div className="min-h-screen p-4 md:p-8 pt-24 md:pt-8 text-white">
         <div className="container mx-auto max-w-5xl">
           {/* --- Profile Section --- */}
@@ -85,12 +79,11 @@ function AboutPage() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <div className="relative aspect-square overflow-hidden">
+              <div className="relative aspect-square overflow-hidden rounded-lg">
                 <LazyImage
                     src="https://picsum.photos/seed/about-me/800/800"
                     alt="A portrait of Vikas"
                     className="w-full h-full transition-transform duration-500 group-hover:scale-105"
-                    // FIX: Added required width and height props to LazyImage.
                     width={800}
                     height={800}
                 />
@@ -169,7 +162,6 @@ function AboutPage() {
                             <Editable 
                               path={`testimonials[${index}].image`} 
                               type="media"
-                              // FIX: Added required width and height props to LazyImage.
                               render={src => <LazyImage src={src} alt={testimonial.name} className="w-12 h-12 rounded-full mr-4" width={48} height={48} />} 
                             />
                             <div>
@@ -188,7 +180,6 @@ function AboutPage() {
           </motion.div>
         </div>
       </div>
-    </AnimatedPage>
     <AnimatePresence>
         {editingTestimonial && (
             <AddTestimonialModal
@@ -200,5 +191,3 @@ function AboutPage() {
     </>
   );
 };
-
-export default AboutPage;

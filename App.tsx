@@ -4,7 +4,8 @@
 // which powers the in-page, real-time content editing functionality.
 
 // FIX: Import `ReactNode` explicitly to ensure consistent type resolution across the project.
-import React, { ReactNode } from 'react';
+// FIX: Added useState and useEffect to fetch initial content.
+import React, { ReactNode, useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -21,6 +22,8 @@ import { EditorProvider, useEditor } from './components/EditorProvider';
 import EditorToolbar from './components/EditorToolbar';
 import LoginModal from './components/LoginModal';
 import MediaUploadModal from './components/MediaUploadModal';
+// FIX: Import SiteContent type to properly type the fetched data.
+import { SiteContent } from './types';
 
 // FIX: Define props interface explicitly for ErrorBoundary. An ErrorBoundary requires children to be useful.
 interface ErrorBoundaryProps {
@@ -71,9 +74,35 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, { hasError: bool
 
 // --- Main App Wrapper ---
 function App() {
+  // FIX: Fetch initial content to provide to the EditorProvider.
+  // The EditorProvider requires the `initialContent` prop.
+  const [initialContent, setInitialContent] = useState<SiteContent | null>(null);
+
+  useEffect(() => {
+    // Assuming content.json is in a public 'data' directory for client-side fetching.
+    fetch('/data/content.json')
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
+        }
+        return res.json();
+      })
+      .then(data => setInitialContent(data))
+      .catch(err => console.error("Failed to load site content:", err));
+  }, []);
+  
+  // Render a loading state until the initial content is fetched.
+  if (!initialContent) {
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-black">
+            <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-neutral-500"></div>
+        </div>
+    );
+  }
+
   return (
     <HashRouter>
-      <EditorProvider>
+      <EditorProvider initialContent={initialContent}>
         <ScrollToTop />
         <div className="min-h-screen bg-black text-white antialiased">
           <Header />

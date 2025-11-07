@@ -8,8 +8,8 @@ export interface Project {
   category: string;
   year: string;
   tools: string[];
-  thumbnail?: string; // Thumbnail is optional, as video can be primary
-  video?: string; // Simplified to a single URL for direct links or embeds
+  thumbnail?: string;
+  video?: string;
   description: string;
   images: string[];
 }
