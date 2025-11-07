@@ -101,7 +101,7 @@ const FloatingVideoPlayer: React.FC<{ src: string }> = ({ src }) => {
                 if (containerRef.current) observer.unobserve(containerRef.current);
             };
         }
-    }, [isClosed]);
+    }, [isClosed, isYouTube]);
 
     useEffect(() => {
         if (!isYouTube || !videoId || !playerDivRef.current) return;
@@ -169,7 +169,7 @@ const FloatingVideoPlayer: React.FC<{ src: string }> = ({ src }) => {
     }
     
     return (
-        <div ref={containerRef} className="relative aspect-video w-full h-full bg-black rounded-lg">
+        <div ref={containerRef} className="relative aspect-video w-full h-full bg-black rounded-lg overflow-hidden">
              <AnimatePresence>
                 {!isClosed && (
                     <motion.div
@@ -180,7 +180,7 @@ const FloatingVideoPlayer: React.FC<{ src: string }> = ({ src }) => {
                         dragMomentum={false}
                         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                     >
-                        <div className="relative w-full h-full aspect-video">
+                        <div className={`relative w-full h-full aspect-video transition-all duration-300 ease-in-out ${!isPlaying ? 'grayscale scale-105' : 'grayscale-0 scale-100'}`}>
                             {isYouTube ? (
                                 <div ref={playerDivRef} className="w-full h-full" />
                             ) : (
