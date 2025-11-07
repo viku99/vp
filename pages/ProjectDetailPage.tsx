@@ -1,58 +1,148 @@
 // 📄 Project Detail Page
 // This page showcases a single project in detail, now with full inline editing capabilities.
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import AnimatedPage from '../components/AnimatedPage';
 import { useEditor } from '../components/EditorProvider';
 import Editable from '../components/Editable';
 
-// --- Helper to convert YouTube watch URL to embed URL ---
-const getYouTubeEmbedUrl = (url: string) => {
+// Define YT types for the global window object to avoid TS errors
+declare global {
+  interface Window {
+    onYouTubeIframeAPIReady: () => void;
+    YT: any;
+  }
+}
+
+// --- Helper to get video ID from various YouTube URL formats ---
+const getYouTubeVideoId = (url: string): string | null => {
     try {
         const urlObj = new URL(url);
         let videoId: string | null = null;
-        if (urlObj.hostname.includes('youtube.com')) {
-            videoId = urlObj.searchParams.get('v');
-        } else if (urlObj.hostname.includes('youtu.be')) {
-            videoId = urlObj.pathname.slice(1);
+        
+        const hostname = urlObj.hostname;
+        const pathname = urlObj.pathname;
+
+        if (hostname.includes('youtube.com')) {
+            if (pathname.startsWith('/shorts/')) {
+                videoId = pathname.split('/')[2];
+            } else {
+                videoId = urlObj.searchParams.get('v');
+            }
+        } else if (hostname.includes('youtu.be')) {
+            videoId = pathname.slice(1);
         }
         
         if (videoId) {
-            // Add autoplay, mute, and loop parameters for a seamless viewing experience
-            const embedParams = new URLSearchParams();
-            embedParams.set('autoplay', '1');
-            embedParams.set('mute', '1'); // Autoplay on most browsers requires the video to be muted
-            embedParams.set('loop', '1');
-            embedParams.set('playlist', videoId); // Loop for a single video requires the playlist parameter
-            return `https://www.youtube.com/embed/${videoId}?${embedParams.toString()}`;
+            // Clean any potential query params from the video ID
+            return videoId.split('?')[0];
         }
+        return null;
     } catch (e) {
-      // Not a valid URL, return original
+        // Not a valid URL
+        return null;
     }
-    return url;
 };
+
+const YOUTUBE_API_SRC = 'https://www.youtube.com/iframe_api';
 
 
 // --- Video Player Component ---
 const VideoPlayer = ({ src }: { src: string }) => {
-    // Start in a playing state for autoplay
-    const [isPlaying, setIsPlaying] = useState(true); 
+    const [isPlaying, setIsPlaying] = useState(true);
+    const [playbackError, setPlaybackError] = useState(false);
+    const playerContainerRef = useRef<HTMLDivElement>(null);
+    const playerInstanceRef = useRef<any>(null); // To hold the YT.Player instance
+
     const isYouTube = src.includes('youtube.com') || src.includes('youtu.be');
-    const embedUrl = isYouTube ? getYouTubeEmbedUrl(src) : src;
+    const videoId = isYouTube ? getYouTubeVideoId(src) : null;
+    
+    useEffect(() => {
+        if (!isYouTube || !videoId || !playerContainerRef.current) return;
+        
+        const container = playerContainerRef.current;
+        // The API replaces the div, so we need a stable reference
+        if (container.childElementCount > 0) return;
+
+        const createPlayer = () => {
+             if (playerInstanceRef.current) {
+                playerInstanceRef.current.destroy();
+            }
+            playerInstanceRef.current = new window.YT.Player(container, {
+                videoId: videoId,
+                playerVars: {
+                    autoplay: 1,
+                    mute: 1,
+                    loop: 1,
+                    playlist: videoId,
+                    controls: 1,
+                    modestbranding: 1,
+                    rel: 0,
+                },
+                events: {
+                    'onError': (event: any) => {
+                        // Error 101, 150, 153 all indicate embedding is disabled
+                        if ([101, 150, 153].includes(event.data)) {
+                             setPlaybackError(true);
+                        }
+                    },
+                    'onStateChange': (event: any) => {
+                        setIsPlaying(event.data === window.YT.PlayerState.PLAYING);
+                    }
+                }
+            });
+        };
+
+        if (!window.YT) {
+            const tag = document.createElement('script');
+            tag.src = YOUTUBE_API_SRC;
+            const firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode!.insertBefore(tag, firstScriptTag);
+            window.onYouTubeIframeAPIReady = createPlayer;
+        } else {
+             createPlayer();
+        }
+
+        return () => {
+            if (playerInstanceRef.current) {
+                playerInstanceRef.current.destroy();
+                playerInstanceRef.current = null;
+            }
+        };
+
+    }, [isYouTube, videoId]);
+
+
+    if (playbackError && videoId) {
+        return (
+            <div className="relative aspect-video bg-black rounded-lg overflow-hidden group flex flex-col items-center justify-center text-center p-4">
+                <img 
+                    src={`https://i3.ytimg.com/vi/${videoId}/maxresdefault.jpg`} 
+                    alt="Video thumbnail"
+                    className="absolute inset-0 w-full h-full object-cover opacity-30" 
+                />
+                <div className="relative z-10">
+                    <h3 className="text-xl font-bold text-white mb-2">Playback Unavailable</h3>
+                    <p className="text-neutral-300 mb-4 text-sm max-w-sm">This video can't be played here due to restrictions set by YouTube or the content owner.</p>
+                    <a 
+                        href={src}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group inline-block mt-4 px-5 py-2 bg-red-600 text-white font-bold text-sm tracking-wider uppercase rounded-md hover:bg-red-500 transition-all duration-300"
+                    >
+                        Watch on YouTube <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
+                    </a>
+                </div>
+            </div>
+        );
+    }
 
     if (isYouTube) {
         return (
             <div className="relative aspect-video bg-black rounded-lg overflow-hidden group">
-                <iframe
-                    src={embedUrl}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="w-full h-full"
-                    title="Project Video"
-                ></iframe>
+                <div ref={playerContainerRef} className="w-full h-full" />
             </div>
         );
     }

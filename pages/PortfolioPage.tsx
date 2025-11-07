@@ -3,7 +3,7 @@
 // In edit mode, it provides controls to add, edit, delete, and reorder projects.
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { motion, AnimatePresence, Reorder } from 'framer-motion';
+import { motion } from 'framer-motion';
 import ProjectCard from '../components/ProjectCard';
 import AnimatedPage from '../components/AnimatedPage';
 import { useEditor } from '../components/EditorProvider';
@@ -11,6 +11,27 @@ import { Project } from '../types';
 
 const INITIAL_PROJECT_COUNT = 9;
 const PROJECTS_TO_LOAD_MORE = 6;
+
+// --- Custom Debounce Hook ---
+// Improves performance by delaying state updates on rapid input changes,
+// preventing re-renders and filtering on every keystroke.
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    // Cleanup function to clear the timeout if the value changes before the delay has passed
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -28,20 +49,18 @@ const ClearIcon = () => ( <svg xmlns="http://www.w3.org/2000/svg" className="h-5
 const AddIcon = () => ( <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg> );
 
 function PortfolioPage() {
-  const { siteContent, isEditMode, updateSiteContent } = useEditor();
+  const { siteContent, isEditMode } = useEditor();
   const portfolioProjects = siteContent?.projects || [];
   
   const [inputValue, setInputValue] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [visibleCount, setVisibleCount] = useState(INITIAL_PROJECT_COUNT);
   
-  useEffect(() => {
-    const debounceTimer = setTimeout(() => setSearchQuery(inputValue), 300);
-    return () => clearTimeout(debounceTimer);
-  }, [inputValue]);
+  // Debounce the search input to avoid filtering on every keystroke
+  const searchQuery = useDebounce(inputValue, 300);
   
   useEffect(() => {
+    // Reset the number of visible projects when the filters change
     setVisibleCount(INITIAL_PROJECT_COUNT);
   }, [searchQuery, selectedCategory]);
 
@@ -60,33 +79,6 @@ function PortfolioPage() {
 
   const handleLoadMore = () => setVisibleCount(prev => prev + PROJECTS_TO_LOAD_MORE);
   
-  const handleReorderProjects = (newOrder: Project[]) => {
-      // This is tricky because `newOrder` only contains the *visible* items.
-      // We need to merge it back into the full, unfiltered list.
-      updateSiteContent(draft => {
-          // Create a map for quick lookups
-          const newOrderMap = new Map(newOrder.map(p => [p.id, p]));
-          const originalProjects = draft.projects;
-          const reorderedFullList: Project[] = [];
-          const usedIds = new Set<string>();
-
-          // First, add the reordered items in their new sequence
-          for (const project of newOrder) {
-              reorderedFullList.push(project);
-              usedIds.add(project.id);
-          }
-
-          // Then, append the remaining items from the original list that weren't part of the reorder
-          for (const project of originalProjects) {
-              if (!usedIds.has(project.id)) {
-                  reorderedFullList.push(project);
-              }
-          }
-          
-          draft.projects = reorderedFullList;
-      });
-  }
-
   return (
     <AnimatedPage>
       <div className="min-h-screen p-4 md:p-8 pt-24 md:pt-8 text-white">
@@ -152,23 +144,16 @@ function PortfolioPage() {
           
           {filteredProjects.length > 0 ? (
             <>
-            <Reorder.Group 
-                axis="y" 
-                values={displayedProjects} 
-                onReorder={handleReorderProjects} 
+            <motion.div
                 className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8"
-                // This is a proxy for `as="div"`
-                as="div"
-                // variants={containerVariants}
-                // initial="hidden"
-                // animate="visible"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
             >
                 {displayedProjects.map((project, index) => (
-                    <Reorder.Item key={project.id} value={project} as="div">
-                        <ProjectCard project={project} index={index} />
-                    </Reorder.Item>
+                    <ProjectCard key={project.id} project={project} index={index} />
                 ))}
-            </Reorder.Group>
+            </motion.div>
 
               {visibleCount < filteredProjects.length && (
                 <motion.div className="text-center mt-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>

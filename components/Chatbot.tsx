@@ -67,7 +67,7 @@ function Chatbot() {
                     sender: 'bot', 
                     text: "Hi there! I'm Fae, your guide to Vikas's portfolio. How can I help you discover his work?",
                     suggestions: [
-                        "Tell me about the 'Neon City' project",
+                        "Tell me about the 'Aurora' project",
                         "What did Jane Doe say about Vikas?",
                         "What are his skills?",
                     ]

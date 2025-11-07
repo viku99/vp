@@ -138,37 +138,43 @@ function AboutPage() {
             
             {siteContent.testimonials.length > 0 ? (
                 <Reorder.Group axis="y" values={siteContent.testimonials} onReorder={handleReorderTestimonials} className="space-y-8">
-                  {siteContent.testimonials.map((testimonial, index) => (
-                    <Reorder.Item key={testimonial.id} value={testimonial}>
-                    <motion.div
-                      className="bg-neutral-900 p-6 rounded-lg flex flex-col relative group"
-                      initial={{ opacity: 0, y: 50 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, amount: 0.5 }}
-                      transition={{ duration: 0.6 }}
-                    >
-                      {isEditMode && (
-                          <div className="absolute top-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button className="p-1.5 bg-blue-600 rounded-full text-white hover:bg-blue-500" onClick={() => setEditingTestimonial(testimonial)}><EditIcon /></button>
-                              <button className="p-1.5 bg-red-600 rounded-full text-white hover:bg-red-500" onClick={() => handleDeleteTestimonial(testimonial.id)}><DeleteIcon /></button>
-                              <div className="p-1.5"><ReorderIcon /></div>
+                  <AnimatePresence initial={false}>
+                    {siteContent.testimonials.map((testimonial, index) => (
+                      <Reorder.Item 
+                        key={testimonial.id} 
+                        value={testimonial}
+                        exit={{ opacity: 0, transition: { duration: 0.3 } }}
+                      >
+                        <motion.div
+                          className="bg-neutral-900 p-6 rounded-lg flex flex-col relative group"
+                          initial={{ opacity: 0, y: 50 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true, amount: 0.5 }}
+                          transition={{ duration: 0.6 }}
+                        >
+                          {isEditMode && (
+                              <div className="absolute top-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <button className="p-1.5 bg-blue-600 rounded-full text-white hover:bg-blue-500" onClick={() => setEditingTestimonial(testimonial)}><EditIcon /></button>
+                                  <button className="p-1.5 bg-red-600 rounded-full text-white hover:bg-red-500" onClick={() => handleDeleteTestimonial(testimonial.id)}><DeleteIcon /></button>
+                                  <div className="p-1.5"><ReorderIcon /></div>
+                              </div>
+                          )}
+                          <Editable path={`testimonials[${index}].quote`} as="p" className="text-neutral-300 italic flex-grow mb-6" multiline />
+                          <div className="flex items-center">
+                            <Editable 
+                              path={`testimonials[${index}].image`} 
+                              type="media"
+                              render={src => <img src={src} alt={testimonial.name} className="w-12 h-12 rounded-full mr-4 object-cover" />} 
+                            />
+                            <div>
+                              <Editable path={`testimonials[${index}].name`} as="p" className="font-bold text-white" />
+                              <Editable path={`testimonials[${index}].title`} as="p" className="text-sm text-neutral-500" />
+                            </div>
                           </div>
-                      )}
-                      <Editable path={`testimonials[${index}].quote`} as="p" className="text-neutral-300 italic flex-grow mb-6" multiline />
-                      <div className="flex items-center">
-                        <Editable 
-                          path={`testimonials[${index}].image`} 
-                          type="media"
-                          render={src => <img src={src} alt={testimonial.name} className="w-12 h-12 rounded-full mr-4 object-cover" />} 
-                        />
-                        <div>
-                          <Editable path={`testimonials[${index}].name`} as="p" className="font-bold text-white" />
-                          <Editable path={`testimonials[${index}].title`} as="p" className="text-sm text-neutral-500" />
-                        </div>
-                      </div>
-                    </motion.div>
-                    </Reorder.Item>
-                  ))}
+                        </motion.div>
+                      </Reorder.Item>
+                    ))}
+                  </AnimatePresence>
                 </Reorder.Group>
             ) : (
                <p className="text-center text-neutral-500">No testimonials yet. Add one in Edit Mode!</p>

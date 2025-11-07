@@ -1,3 +1,4 @@
+
 {
   "projects": [
     {
@@ -16,18 +17,18 @@
       ]
     },
     {
-      "id": "neoncity",
-      "title": "Neon City VFX",
+      "id": "cyber-sentinel",
+      "title": "Cyber Sentinel",
       "category": "VFX",
       "year": "2023",
-      "tools": ["Nuke", "Autodesk Maya", "DaVinci Resolve"],
-      "thumbnail": "https://picsum.photos/seed/neoncity-thumb/800/600",
-      "video": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      "description": "3D VFX integration shot blending live-action footage with rendered futuristic cityscapes. The challenge was to match lighting and reflections for a seamless composite.",
+      "tools": ["Blender", "Nuke", "After Effects"],
+      "thumbnail": "https://picsum.photos/seed/sentinel-thumb/800/600",
+      "video": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+      "description": "A character-focused VFX shot featuring a robotic sentinel. This project involved complex hard-surface modeling, procedural texturing, and integrating the CG element into a dynamic, hand-held camera shot.",
       "images": [
-        "https://picsum.photos/seed/neon1/1200/800",
-        "https://picsum.photos/seed/neon2/1200/800",
-        "https://picsum.photos/seed/neon3/1200/800"
+        "https://picsum.photos/seed/sentinel1/1200/800",
+        "https://picsum.photos/seed/sentinel2/1200/800",
+        "https://picsum.photos/seed/sentinel3/1200/800"
       ]
     },
     {

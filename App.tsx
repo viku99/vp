@@ -22,9 +22,9 @@ import EditorToolbar from './components/EditorToolbar';
 import LoginModal from './components/LoginModal';
 import MediaUploadModal from './components/MediaUploadModal';
 
-// FIX: Define props interface explicitly for ErrorBoundary and make children optional.
+// FIX: Define props interface explicitly for ErrorBoundary. An ErrorBoundary requires children to be useful.
 interface ErrorBoundaryProps {
-  children?: ReactNode;
+  children: ReactNode;
 }
 
 // --- Error Boundary (remains unchanged) ---
@@ -32,7 +32,9 @@ interface ErrorBoundaryProps {
 // FIX: Changed React.ReactNode to the explicitly imported ReactNode for type consistency.
 // FIX: Using ErrorBoundaryProps to fix typing errors. This resolves issues where TypeScript fails to recognize 'props' on the component instance and incorrectly reports missing 'children'.
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, { hasError: boolean }> {
+  // FIX: Replaced constructor with a class property for state initialization. This is a more modern approach and resolves issues where TypeScript fails to correctly infer component state and props, fixing errors on `this.state` and `this.props`.
   state = { hasError: false };
+
   // FIX: Added the required `error` parameter to the `getDerivedStateFromError` static method.
   static getDerivedStateFromError(_error: Error) {
     return { hasError: true };

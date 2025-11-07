@@ -13,10 +13,20 @@ const downloadJson = (data: unknown, filename: string) => {
     const link = document.createElement('a');
     link.href = url;
     link.download = filename;
+
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+
+    setTimeout(() => {
+        // Applying the user's recommended safe removal pattern to robustly
+        // prevent the "removeChild" race condition error. This checks that the link
+        // is still a child of the body before attempting to remove it.
+        if (document.body.contains(link)) {
+            document.body.removeChild(link);
+        }
+        // Always revoke the object URL to prevent memory leaks.
+        URL.revokeObjectURL(url);
+    }, 100);
 };
 
 
@@ -62,38 +72,45 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [siteContent, setSiteContent] = useState<SiteContent | null>(null);
+    const [initialContent, setInitialContent] = useState<SiteContent | null>(null); // To hold pristine data
     const [isEditMode, setIsEditMode] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isLoginVisible, setIsLoginVisible] = useState(false);
     const [mediaModalState, setMediaModalState] = useState<MediaModalState>({ isVisible: false, path: null });
 
 
-    const loadData = useCallback(async () => {
-        setIsLoading(true);
-        setError(null);
-        try {
-            // Check for a draft in local storage first
-            const draftContent = localStorage.getItem(DRAFT_CONTENT_KEY);
-            if (draftContent) {
-                setSiteContent(JSON.parse(draftContent));
-            } else {
-                // Fetch the original content if no draft exists
-                const response = await fetch('/data/content.json');
-                if (!response.ok) throw new Error(`Failed to fetch content: ${response.statusText}`);
-                const data = await response.json();
-                setSiteContent(data);
-            }
-        } catch (error: any) {
-            console.error("Failed to load portfolio data:", error);
-            setError(error.message || "An unknown error occurred while loading site data.");
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
-
     useEffect(() => {
+        const loadData = async () => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                // Fetch the initial content from the JSON file.
+                // Using a relative path './' is more robust for different hosting environments.
+                const response = await fetch('./data/content.json');
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch content: ${response.status} ${response.statusText}`);
+                }
+                const data: SiteContent = await response.json();
+                setInitialContent(data);
+
+                // Check for a draft in local storage first
+                const draftContent = localStorage.getItem(DRAFT_CONTENT_KEY);
+                if (draftContent) {
+                    setSiteContent(JSON.parse(draftContent));
+                } else {
+                    // If no draft, use the fetched data
+                    setSiteContent(data);
+                }
+            } catch (err: any) {
+                console.error("Failed to load portfolio data:", err);
+                setError(err.message || "An unknown error occurred while loading site data.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
         loadData();
-    }, [loadData]);
+    }, []); // Runs only once on component mount
 
     // Auto-save any changes to the site content to localStorage when in edit mode
     useEffect(() => {
@@ -146,9 +163,10 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     const resetContent = useCallback(() => {
         if (window.confirm("Are you sure you want to discard all unpublished changes? This will revert the content to your last published version.")) {
             localStorage.removeItem(DRAFT_CONTENT_KEY);
-            loadData(); // Reload from original file
+            // Reset to the pristine content fetched on load
+            setSiteContent(initialContent);
         }
-    }, [loadData]);
+    }, [initialContent]);
 
     // --- Media Modal Controls ---
     const openMediaModal = (path: string) => setMediaModalState({ isVisible: true, path });

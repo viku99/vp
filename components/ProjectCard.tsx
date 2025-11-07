@@ -29,11 +29,6 @@ const EditIcon = () => (
 const DeleteIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
 );
-const ReorderIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-white cursor-grab active:cursor-grabbing">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />
-    </svg>
-);
 
 
 function ProjectCard({ project, index }: { project: Project; index: number }) {
@@ -61,11 +56,9 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
     <motion.div
       className={`group relative aspect-video overflow-hidden ${getCardSpan(index)}`}
       variants={cardVariants}
-      key={project.id}
     >
       {isEditMode && (
           <div className="absolute top-2 right-2 z-10 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="p-2"><ReorderIcon /></div>
               <button onClick={handleEdit} className="p-2 bg-blue-600 rounded-full text-white hover:bg-blue-500 transition-colors"><EditIcon /></button>
               <button onClick={handleDelete} className="p-2 bg-red-600 rounded-full text-white hover:bg-red-500 transition-colors"><DeleteIcon /></button>
           </div>
