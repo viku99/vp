@@ -1,4 +1,5 @@
 
+
 // 🏠 Home Page
 // This is the main landing page of the portfolio.
 // It features a full-screen, cinematic hero section designed to make a strong first impression.
@@ -7,6 +8,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import AnimatedPage from '../components/AnimatedPage';
+import ProgressiveBackgroundImage from '../components/ProgressiveBackgroundImage';
 
 function HomePage() {
   const title = "VIKAS";
@@ -35,12 +37,12 @@ function HomePage() {
     <AnimatedPage>
       <div className="relative flex items-center justify-center min-h-screen text-center px-4 overflow-hidden">
         {/* Background Image */}
-        <div
-          className="absolute inset-0 bg-cover bg-center z-0"
-          style={{ backgroundImage: `url(https://picsum.photos/seed/homepage/1920/1080)` }}
+        <ProgressiveBackgroundImage
+          src="https://picsum.photos/seed/homepage/1920/1080"
+          className="absolute inset-0 z-0"
         >
           <div className="absolute inset-0 bg-black opacity-60"></div>
-        </div>
+        </ProgressiveBackgroundImage>
 
         {/* Content */}
         <div className="relative z-10">

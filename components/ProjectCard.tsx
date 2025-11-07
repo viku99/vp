@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Project } from '../types';
 import { useEditor } from './EditorProvider';
+import LazyImage from './LazyImage';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 50 },
@@ -70,10 +71,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
           </div>
       )}
       <Link to={`/portfolio/${project.id}`} className="block w-full h-full">
-        <img
+        <LazyImage
           src={project.thumbnail || fallbackThumbnail}
           alt={project.title}
-          className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
+          className="w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-black bg-opacity-40 transition-opacity duration-500 group-hover:bg-opacity-70" />
         <div className="absolute inset-0 flex flex-col justify-end p-6 text-white">

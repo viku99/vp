@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import AnimatedPage from '../components/AnimatedPage';
 import { useEditor } from '../components/EditorProvider';
 import Editable from '../components/Editable';
+import LazyImage from '../components/LazyImage';
 
 // Define YT types for the global window object to avoid TS errors
 declare global {
@@ -19,7 +20,7 @@ declare global {
 // --- Icons ---
 const ShareIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6.002l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.368a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6.002l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.368a3 3 0 105.367 2.684 3 3 0 00-5.367 2.684z" />
     </svg>
 );
 const TwitterIcon = () => (
@@ -288,9 +289,11 @@ function ProjectDetailPage() {
         if (project.thumbnail) {
             return (
                 <Editable path={`${basePath}.thumbnail`} type="media">
-                     <div className="relative aspect-video bg-neutral-900 rounded-lg overflow-hidden">
-                        <img src={project.thumbnail} alt={project.title} className="w-full h-full object-cover" />
-                     </div>
+                     <LazyImage 
+                        src={project.thumbnail} 
+                        alt={project.title} 
+                        className="aspect-video bg-neutral-900 rounded-lg"
+                    />
                 </Editable>
             );
         }
@@ -407,7 +410,11 @@ function ProjectDetailPage() {
                                             type="media"
                                         >
                                             <motion.div className="group relative aspect-video overflow-hidden rounded-lg" whileHover={{ scale: 1.03 }} transition={{ type: 'spring', stiffness: 300 }}>
-                                                <img src={image} alt={`Project image ${index + 1}`} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                                                <LazyImage 
+                                                    src={image} 
+                                                    alt={`Project image ${index + 1}`} 
+                                                    className="w-full h-full" 
+                                                />
                                             </motion.div>
                                         </Editable>
                                     ))}

@@ -9,6 +9,7 @@ import { useEditor } from '../components/EditorProvider';
 import Editable from '../components/Editable';
 import { Testimonial } from '../types';
 import AddTestimonialModal from '../components/AddTestimonialModal';
+import LazyImage from '../components/LazyImage';
 
 
 // --- Icons for Edit Mode ---
@@ -85,9 +86,10 @@ function AboutPage() {
               transition={{ duration: 0.8, delay: 0.2 }}
             >
               <div className="relative aspect-square overflow-hidden">
-                <div
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
-                  style={{ backgroundImage: `url(https://picsum.photos/seed/about-me/800/800)` }}
+                <LazyImage
+                    src="https://picsum.photos/seed/about-me/800/800"
+                    alt="A portrait of Vikas"
+                    className="w-full h-full transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
             </motion.div>
@@ -164,7 +166,7 @@ function AboutPage() {
                             <Editable 
                               path={`testimonials[${index}].image`} 
                               type="media"
-                              render={src => <img src={src} alt={testimonial.name} className="w-12 h-12 rounded-full mr-4 object-cover" />} 
+                              render={src => <LazyImage src={src} alt={testimonial.name} className="w-12 h-12 rounded-full mr-4" />} 
                             />
                             <div>
                               <Editable path={`testimonials[${index}].name`} as="p" className="font-bold text-white" />
