@@ -2,11 +2,8 @@
   "version": 2,
   "builds": [
     {
-      "src": "*",
-      "use": "@vercel/static"
+      "src": "next.config.mjs",
+      "use": "@vercel/next"
     }
-  ],
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

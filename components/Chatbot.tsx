@@ -31,7 +31,13 @@ function RichText({ text }: { text: string }): ReactElement {
   let element: React.ReactNode;
 
   if (match[2] && match[3]) {
-    element = <Link to={match[3]} className="text-blue-400 underline hover:text-blue-300"><RichText text={match[2]} /></Link>;
+    // Ensure internal links use the Link component for SPA navigation
+    const isInternal = match[3].startsWith('/');
+    if (isInternal) {
+        element = <Link to={match[3]} className="text-blue-400 underline hover:text-blue-300"><RichText text={match[2]} /></Link>;
+    } else {
+        element = <a href={match[3]} target="_blank" rel="noopener noreferrer" className="text-blue-400 underline hover:text-blue-300"><RichText text={match[2]} /></a>;
+    }
   } else if (match[5]) {
     element = <strong><RichText text={match[5]} /></strong>;
   } else if (match[7]) {
@@ -105,7 +111,10 @@ export default function Chatbot() {
             setMessages(prev => [...prev.slice(0, -1), { sender: 'bot', text: "Sorry, I can't connect. The API key is missing. Please contact the site administrator." }]); setIsLoading(false); return;
         }
         if (!chatRef.current) {
-            setMessages(prev => [...prev.slice(0, -1), { sender: 'bot', text: "I'm still getting ready. Please try again in a moment." }]); setIsLoading(false); return;
+            initializeChat(); // Re-initialize if chat is not ready
+            if(!chatRef.current) {
+                setMessages(prev => [...prev.slice(0, -1), { sender: 'bot', text: "I'm still getting ready. Please try again in a moment." }]); setIsLoading(false); return;
+            }
         }
         try {
             const responseStream = await chatRef.current.sendMessageStream({ message: currentInput });

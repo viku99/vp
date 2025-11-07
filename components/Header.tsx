@@ -19,7 +19,7 @@ export default function Header() {
         <nav className="w-full">
           <ul className="flex justify-around items-center md:flex-col md:space-y-8">
             {navItems.map((item) => {
-              const isActive = item.path === '/' ? pathname === '/' : pathname?.startsWith(item.path);
+              const isActive = pathname != null && (item.path === '/' ? pathname === '/' : pathname.startsWith(item.path));
               return (
                 <li key={item.path}>
                   <Link
