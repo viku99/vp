@@ -94,6 +94,8 @@ const FloatingVideoPlayer: React.FC<{ src: string }> = ({ src }) => {
     
                 if (entry.isIntersecting) {
                     // Player is back in view, so restore it.
+                    // By resetting the 'closed' state, we allow the player to reappear and the mini-player logic to function again.
+                    setIsClosed(false);
                     setIsMini(false);
                 } else {
                     // Player is out of view.
@@ -244,7 +246,7 @@ const FloatingVideoPlayer: React.FC<{ src: string }> = ({ src }) => {
                         dragMomentum={false}
                         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                     >
-                        <div className={`relative w-full h-full aspect-video transition-all duration-300 ease-in-out ${!isPlaying ? 'grayscale' : 'grayscale-0'}`}>
+                        <div className={`relative w-full h-full aspect-video transition-all duration-500 ease-in-out ${!isPlaying ? 'scale-105 grayscale' : 'scale-100 grayscale-0'}`}>
                             {isYouTube ? (
                                 <div ref={playerDivRef} className="w-full h-full" />
                             ) : (
