@@ -1,4 +1,3 @@
-'use client';
 import React, { useState, useRef, useEffect, useCallback, ReactNode } from 'react';
 import { useEditor } from './EditorProvider';
 import get from 'lodash.get';

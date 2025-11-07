@@ -95,7 +95,6 @@ const FloatingVideoPlayer: React.FC<{ src: string }> = ({ src }) => {
                 if (entry.isIntersecting) {
                     // Player is back in view, so restore it.
                     setIsMini(false);
-                    setIsClosed(false);
                 } else {
                     // Player is out of view.
                     // Activate mini-player only if it hasn't been manually closed.
@@ -123,35 +122,62 @@ const FloatingVideoPlayer: React.FC<{ src: string }> = ({ src }) => {
         if (!isYouTube || !videoId || !playerDivRef.current) return;
         
         const createPlayer = () => {
+             if (!playerDivRef.current) return;
             if (playerInstanceRef.current) playerInstanceRef.current.destroy();
+            
             playerInstanceRef.current = new window.YT.Player(playerDivRef.current, {
                 videoId: videoId,
-                playerVars: { autoplay: 1, mute: 1, loop: 1, playlist: videoId, controls: 1, modestbranding: 1, rel: 0 },
+                playerVars: { 
+                    autoplay: 1, 
+                    mute: 1, 
+                    loop: 1, 
+                    playlist: videoId, 
+                    controls: 1, 
+                    modestbranding: 1, 
+                    rel: 0,
+                    playsinline: 1,
+                    origin: window.location.origin
+                },
                 events: {
                     'onReady': (event: any) => {
+                        event.target.playVideo();
                         setIsPlaying(true);
-                        // Disable native Picture-in-Picture to avoid conflicts with the custom mini-player
                         const iframe = event.target.getIframe();
                         if (iframe) {
                             iframe.setAttribute('disablepictureinpicture', 'true');
                         }
                     },
-                    'onError': (e: any) => { if ([101, 150].includes(e.data)) setPlaybackError(true); },
-                    'onStateChange': (e: any) => setIsPlaying(e.data === window.YT.PlayerState.PLAYING)
+                    'onError': (e: any) => { 
+                        if ([2, 5, 100, 101, 150].includes(e.data)) {
+                            setPlaybackError(true); 
+                        }
+                    },
+                    'onStateChange': (e: any) => {
+                        setIsPlaying(e.data === window.YT.PlayerState.PLAYING)
+                    }
                 }
             });
         };
-        if (!window.YT) {
-            const tag = document.createElement('script');
-            tag.src = YOUTUBE_API_SRC;
-            document.body.appendChild(tag);
+
+        if (!window.YT || !window.YT.Player) {
+            const scriptTag = document.querySelector(`script[src="${YOUTUBE_API_SRC}"]`);
+            if (!scriptTag) {
+                const tag = document.createElement('script');
+                tag.src = YOUTUBE_API_SRC;
+                document.body.appendChild(tag);
+            }
             window.onYouTubeIframeAPIReady = createPlayer;
         } else {
             createPlayer();
         }
+
         return () => {
-            if (playerInstanceRef.current) playerInstanceRef.current.destroy();
-            if (window.onYouTubeIframeAPIReady) window.onYouTubeIframeAPIReady = () => {};
+            if (playerInstanceRef.current && typeof playerInstanceRef.current.destroy === 'function') {
+                playerInstanceRef.current.destroy();
+            }
+            if (window.onYouTubeIframeAPIReady) {
+                 window.onYouTubeIframeAPIReady = () => {};
+            }
         };
     }, [isYouTube, videoId]);
     
@@ -183,6 +209,7 @@ const FloatingVideoPlayer: React.FC<{ src: string }> = ({ src }) => {
             setIsPlaying(false);
         }
         setIsClosed(true);
+        setIsMini(false); // Ensure it disappears completely
     };
 
     const handleExpand = () => {
@@ -217,7 +244,7 @@ const FloatingVideoPlayer: React.FC<{ src: string }> = ({ src }) => {
                         dragMomentum={false}
                         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                     >
-                        <div className={`relative w-full h-full aspect-video transition-all duration-300 ease-in-out ${!isPlaying ? 'grayscale scale-105' : 'grayscale-0 scale-100'}`}>
+                        <div className={`relative w-full h-full aspect-video transition-all duration-300 ease-in-out ${!isPlaying ? 'grayscale' : 'grayscale-0'}`}>
                             {isYouTube ? (
                                 <div ref={playerDivRef} className="w-full h-full" />
                             ) : (
@@ -292,7 +319,6 @@ function ProjectDetailPage() {
                         src={project.thumbnail} 
                         alt={project.title} 
                         className="aspect-video bg-neutral-900 rounded-lg"
-                        // FIX: Added required width and height props.
                         width={1280}
                         height={720}
                     />
@@ -416,7 +442,6 @@ function ProjectDetailPage() {
                                                     src={image} 
                                                     alt={`Project image ${index + 1}`} 
                                                     className="w-full h-full" 
-                                                    // FIX: Added required width and height props.
                                                     width={800}
                                                     height={450}
                                                 />
