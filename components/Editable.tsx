@@ -84,7 +84,8 @@ const Editable: React.FC<EditableProps> = ({
     if (!isEditMode) {
         if (render) return <>{render(text)}</>;
         if (children) return <>{children}</>;
-        return <Component className={className} dangerouslySetInnerHTML={{ __html: Array.isArray(text) ? text.join(', ') : text }} />;
+        // FIX: Render text directly instead of using dangerouslySetInnerHTML for improved security and reliability.
+        return <Component className={className}>{Array.isArray(text) ? text.join(', ') : text}</Component>;
     }
 
     // --- Media Editing ---
@@ -126,8 +127,9 @@ const Editable: React.FC<EditableProps> = ({
     
     const displayContent = () => {
         if (render) return render(text);
-        if (Array.isArray(text)) return text.map((item, index) => <React.Fragment key={index}>{item}{index < text.length -1 && ", "}</React.Fragment>);
-        return <div dangerouslySetInnerHTML={{ __html: text }}/>
+        if (Array.isArray(text)) return text.map((item, index) => <React.Fragment key={index}>{item}{index < text.length - 1 ? ", " : ""}</React.Fragment>);
+        // FIX: Return text directly to avoid creating an extra div and using dangerous HTML injection.
+        return text;
     }
 
     return (

@@ -2,120 +2,119 @@
 {
   "projects": [
     {
-      "id": "aurora",
-      "title": "Aurora — Motion Short",
+      "id": "kinetic-typography",
+      "title": "Kinetic Typography",
       "category": "Motion",
       "year": "2024",
-      "tools": ["After Effects", "Cinema 4D", "Premiere Pro"],
-      "thumbnail": "https://picsum.photos/seed/aurora-thumb/800/600",
-      "video": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-      "description": "A moody atmospheric short blending light and motion to tell a subtle story of discovery in a surreal, dreamlike landscape. The project focused on advanced particle systems and volumetric lighting.",
+      "tools": ["After Effects", "Illustrator", "Figma"],
+      "thumbnail": "https://picsum.photos/seed/kinetic-thumb/800/600",
+      "video": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+      "description": "A dynamic exploration of typography in motion, showcasing various animation principles and text-based storytelling techniques to bring words to life.",
       "images": [
-        "https://picsum.photos/seed/aurora1/1200/800",
-        "https://picsum.photos/seed/aurora2/1200/800",
-        "https://picsum.photos/seed/aurora3/1200/800"
+        "https://picsum.photos/seed/kinetic1/1200/800",
+        "https://picsum.photos/seed/kinetic2/1200/800",
+        "https://picsum.photos/seed/kinetic3/1200/800"
       ]
     },
     {
-      "id": "cyber-sentinel",
-      "title": "Cyber Sentinel",
+      "id": "vfx-compositing",
+      "title": "VFX Compositing Shot",
       "category": "VFX",
       "year": "2023",
-      "tools": ["Blender", "Nuke", "After Effects"],
-      "thumbnail": "https://picsum.photos/seed/sentinel-thumb/800/600",
-      "video": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-      "description": "A character-focused VFX shot featuring a robotic sentinel. This project involved complex hard-surface modeling, procedural texturing, and integrating the CG element into a dynamic, hand-held camera shot.",
+      "tools": ["Nuke", "Blender", "After Effects"],
+      "thumbnail": "https://picsum.photos/seed/vfx-thumb/800/600",
+      "video": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+      "description": "A complex visual effects shot integrating a CG element into live-action footage. This project focused on achieving realistic lighting, shadows, and color grading for a seamless composite.",
       "images": [
-        "https://picsum.photos/seed/sentinel1/1200/800",
-        "https://picsum.photos/seed/sentinel2/1200/800",
-        "https://picsum.photos/seed/sentinel3/1200/800"
+        "https://picsum.photos/seed/vfx1/1200/800",
+        "https://picsum.photos/seed/vfx2/1200/800",
+        "https://picsum.photos/seed/vfx3/1200/800"
       ]
     },
     {
-      "id": "dimension-drift",
-      "title": "Dimension Drift",
+      "id": "product-viz",
+      "title": "3D Product Visualization",
+      "category": "3D",
+      "year": "2023",
+      "tools": ["Cinema 4D", "Redshift", "Houdini"],
+      "thumbnail": "https://picsum.photos/seed/product-thumb/800/600",
+      "video": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+      "description": "Photorealistic rendering of a conceptual high-tech product. This project emphasized studio lighting, advanced material creation, and creating a polished, commercial look.",
+      "images": [
+        "https://picsum.photos/seed/product1/1200/800",
+        "https://picsum.photos/seed/product2/1200/800",
+        "https://picsum.photos/seed/product3/1200/800"
+      ]
+    },
+    {
+      "id": "ui-animation",
+      "title": "App UI Animation",
+      "category": "Motion",
+      "year": "2024",
+      "tools": ["Figma", "After Effects", "Lottie"],
+      "thumbnail": "https://picsum.photos/seed/ui-thumb/800/600",
+      "description": "Designing and animating the user interface for a conceptual mobile app. The focus was on creating smooth, intuitive transitions that enhance the user experience.",
+      "images": [
+        "https://picsum.photos/seed/ui1/1200/800",
+        "https://picsum.photos/seed/ui2/1200/800",
+        "https://picsum.photos/seed/ui3/1200/800"
+      ]
+    },
+    {
+      "id": "abstract-glitch",
+      "title": "Abstract Glitch Art",
+      "category": "VFX",
+      "year": "2022",
+      "tools": ["After Effects", "Premiere Pro", "Processing"],
+      "thumbnail": "https://picsum.photos/seed/glitch-thumb/800/600",
+      "video": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
+      "description": "An experimental piece using datamoshing and procedural effects to create a visually striking abstract animation. It explores themes of digital decay and technological beauty.",
+      "images": [
+        "https://picsum.photos/seed/glitch1/1200/800",
+        "https://picsum.photos/seed/glitch2/1200/800",
+        "https://picsum.photos/seed/glitch3/1200/800"
+      ]
+    },
+    {
+      "id": "concept-art",
+      "title": "World Building Concept Art",
       "category": "Illustration",
       "year": "2023",
-      "tools": ["Photoshop", "Illustrator", "Procreate"],
-      "thumbnail": "https://picsum.photos/seed/dimension-thumb/800/600",
-      "video": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
-      "description": "A series of digital illustrations exploring themes of alternate realities and ethereal beings. Each piece is crafted with a unique color palette and intricate line work.",
+      "tools": ["Photoshop", "Procreate", "Blender"],
+      "thumbnail": "https://picsum.photos/seed/concept-thumb/800/600",
+      "description": "A series of digital paintings developing the visual world for a fictional sci-fi story. The collection focuses on environment design, mood, and architectural styles.",
       "images": [
-        "https://picsum.photos/seed/dimension1/1200/800",
-        "https://picsum.photos/seed/dimension2/1200/800",
-        "https://picsum.photos/seed/dimension3/1200/800"
-      ]
-    },
-    {
-      "id": "echoes",
-      "title": "Echoes in Stillness",
-      "category": "Motion",
-      "year": "2022",
-      "tools": ["After Effects", "Autodesk Maya"],
-      "thumbnail": "https://picsum.photos/seed/echoes-thumb/800/600",
-      "video": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-      "description": "An experimental motion piece exploring the visualization of sound in a minimalist environment. Abstract shapes react and morph to an ambient soundtrack.",
-      "images": [
-        "https://picsum.photos/seed/echoes1/1200/800",
-        "https://picsum.photos/seed/echoes2/1200/800",
-        "https://picsum.photos/seed/echoes3/1200/800"
-      ]
-    },
-    {
-      "id": "cyberscape",
-      "title": "Cyberscape",
-      "category": "VFX",
-      "year": "2024",
-      "tools": ["Nuke", "Houdini", "Figma"],
-      "thumbnail": "https://picsum.photos/seed/cyber-thumb/800/600",
-      "description": "A high-energy title sequence for a fictional sci-fi series. It combines glitch aesthetics with fluid simulations and holographic UI elements.",
-      "images": [
-        "https://picsum.photos/seed/cyber1/1200/800",
-        "https://picsum.photos/seed/cyber2/1200/800",
-        "https://picsum.photos/seed/cyber3/1200/800"
-      ]
-    },
-    {
-      "id": "solaris",
-      "title": "Solaris",
-      "category": "Motion",
-      "year": "2023",
-      "tools": ["Cinema 4D", "Redshift", "After Effects"],
-      "thumbnail": "https://picsum.photos/seed/solaris-thumb/800/600",
-      "video": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
-      "description": "A cinematic journey through a stylized solar system, focusing on dramatic lighting and planetary textures. Rendered with Redshift for photorealistic results.",
-      "images": [
-        "https://picsum.photos/seed/solaris1/1200/800",
-        "https://picsum.photos/seed/solaris2/1200/800",
-        "https://picsum.photos/seed/solaris3/1200/800"
+        "https://picsum.photos/seed/concept1/1200/800",
+        "https://picsum.photos/seed/concept2/1200/800",
+        "https://picsum.photos/seed/concept3/1200/800"
       ]
     }
   ],
   "testimonials": [
     {
       "id": "t1",
-      "quote": "Vikas has an incredible eye for detail and a deep understanding of visual storytelling. The final result exceeded all our expectations and elevated our entire project.",
-      "name": "Jane Doe",
-      "title": "Creative Director, Studio X",
-      "image": "https://i.pravatar.cc/150?u=jane"
+      "quote": "Vikas's dedication to his craft is evident in every frame. He consistently pushed the creative boundaries on our collaborative project and was a fantastic team player.",
+      "name": "Alex Chen",
+      "title": "Fellow VFX Collaborator",
+      "image": "https://i.pravatar.cc/150?u=alex"
     },
     {
       "id": "t2",
-      "quote": "Working with Vikas was a seamless experience from start to finish. Exceptionally professional, endlessly creative, and delivered on time without a hitch. Highly recommended.",
-      "name": "John Smith",
-      "title": "Producer, Film Co.",
-      "image": "https://i.pravatar.cc/150?u=john"
+      "quote": "During my Advanced Compositing course, Vikas demonstrated a rare combination of technical aptitude and artistic vision. He is a promising talent in the VFX industry.",
+      "name": "Dr. Eleanor Vance",
+      "title": "Professor of Digital Arts, CSMU",
+      "image": "https://i.pravatar.cc/150?u=eleanor"
     },
     {
       "id": "t3",
-      "quote": "The motion graphics for our brand launch were absolutely stunning. Vikas has a unique ability to translate abstract concepts into compelling visuals that truly resonate.",
-      "name": "Emily White",
-      "title": "Marketing Lead, Tech Innovate",
-      "image": "https://i.pravatar.cc/150?u=emily"
+      "quote": "He quickly grasped the core concepts of our brand and delivered motion graphics that were both beautiful and effective. A pleasure to mentor on this project.",
+      "name": "Samira Joshi",
+      "title": "Lead Designer, University Project",
+      "image": "https://i.pravatar.cc/150?u=samira"
     }
   ],
   "about": {
-    "bio": "Currently studying Animation & VFX at CSMU, I am deeply passionate about creating compelling motion, crafting immersive stories, and engineering breathtaking visual effects. My work is a blend of technical skill and artistic vision.",
-    "skills": ["After Effects", "Autodesk Maya", "Nuke", "Photoshop", "Cinema 4D", "Premiere Pro", "DaVinci Resolve", "Houdini", "Figma"]
+    "bio": "I'm a digital artist and storyteller specializing in motion design and VFX. Currently honing my craft at CSMU, I'm driven by a passion for creating visuals that are not only technically polished but also emotionally resonant. My goal is to build immersive experiences, one frame at a time.",
+    "skills": ["After Effects", "Cinema 4D", "Nuke", "Houdini", "Blender", "Autodesk Maya", "Premiere Pro", "DaVinci Resolve", "Photoshop", "Illustrator", "Figma", "Procreate"]
   }
 }
