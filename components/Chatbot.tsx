@@ -311,13 +311,15 @@ Engage users in a helpful, human-like conversation about Vikas and his work. Use
 
             for await (const chunk of responseStream) {
                 const chunkText = chunk.text;
-                setMessages(prev => {
-                    const newMessages = [...prev];
-                    const lastMessage = { ...newMessages[newMessages.length - 1] };
-                    lastMessage.text += chunkText;
-                    newMessages[newMessages.length - 1] = lastMessage;
-                    return newMessages;
-                });
+                if (chunkText) { // Only append if chunkText is a non-empty string
+                    setMessages(prev => {
+                        const newMessages = [...prev];
+                        const lastMessage = { ...newMessages[newMessages.length - 1] };
+                        lastMessage.text += chunkText;
+                        newMessages[newMessages.length - 1] = lastMessage;
+                        return newMessages;
+                    });
+                }
             }
 
         } catch (error) {

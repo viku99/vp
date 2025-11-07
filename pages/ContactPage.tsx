@@ -155,8 +155,13 @@ Be thoughtful in your recommendation to ensure the communication is efficient an
                 responseSchema
             },
         });
+        
+        const responseText = response.text;
+        if (!responseText) {
+            throw new Error("Received an empty response from the AI. This could be due to content filtering or a network issue.");
+        }
 
-        const parsedSuggestion = JSON.parse(response.text);
+        const parsedSuggestion = JSON.parse(responseText);
         
         if (parsedSuggestion.channel === 'Decline') {
             setError(parsedSuggestion.reason);
